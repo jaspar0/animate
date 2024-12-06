@@ -4,7 +4,7 @@
     <style>
         body {
             margin: 0;
-            height: 300vh; /* Gives us room to scroll */
+            height: 300vh;
             background: black;
         }
 
@@ -23,6 +23,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .frame img {
@@ -44,15 +45,16 @@
     </style>
 </head>
 <body>
-    <div class="debug">Current Frame: 0</div>
+    <div class="debug">Visible Frames: none</div>
     <div class="container">
-        <!-- Generate 20 frames -->
+        <!-- Frames will be generated here -->
     </div>
 
     <script>
         const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
         let currentFrame = 0;
+        const frames = [];
 
         // Create frames
         for (let i = 0; i < 20; i++) {
@@ -60,16 +62,38 @@
             frame.className = 'frame';
             frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
             container.appendChild(frame);
+            frames.push(frame);
         }
 
-        // Simple scroll handler
+        // Show frames up to the current frame number
+        function showFrames(frameNumber) {
+            // Ensure we stay within bounds
+            frameNumber = Math.max(0, Math.min(frameNumber, 20));
+            
+            // Make all frames up to frameNumber visible
+            frames.forEach((frame, index) => {
+                if (index < frameNumber) {
+                    frame.style.opacity = '1';
+                }
+            });
+
+            // Update debug display
+            if (frameNumber === 0) {
+                debug.textContent = 'Visible Frames: none';
+            } else {
+                debug.textContent = `Visible Frames: 1-${frameNumber}`;
+            }
+        }
+
+        // Scroll handler
         window.addEventListener('scroll', () => {
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
             const newFrame = Math.min(Math.floor(scrollPercent * 20) + 1, 20);
             
+            // Only process if we're moving forward to a new frame
             if (newFrame > currentFrame) {
                 currentFrame = newFrame;
-                debug.textContent = `Current Frame: ${currentFrame}`;
+                showFrames(currentFrame);
             }
         });
     </script>
