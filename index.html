@@ -74,7 +74,7 @@
     </style>
 </head>
 <body>
-    <div class="debug">Scroll to activate frames.</div>
+    <div class="debug">Scroll to activate or deactivate frames.</div>
     <button class="reset-button">Reset Animation</button>
     <div class="container"></div>
 
@@ -115,12 +115,15 @@
             frames.forEach((frame, index) => {
                 if (index <= frameIndex) {
                     frame.style.opacity = '1'; // Make visible
+                } else {
+                    frame.style.opacity = '0'; // Hide frames beyond the active index
                 }
             });
             updateDebugDisplay();
         }
 
         function resetAnimation() {
+            currentFrameIndex = 0; // Reset to the first frame
             frames.forEach(frame => {
                 frame.style.opacity = '0'; // Reset visibility
             });
@@ -129,13 +132,13 @@
 
         let currentFrameIndex = 0; // Track the current frame index
 
-        // Listen to wheel events for scrolling simulation
+        // Listen to wheel events for forward and backward scrolling
         window.addEventListener('wheel', (event) => {
             const direction = event.deltaY > 0 ? 1 : -1; // Scroll direction
             const newFrameIndex = Math.min(
                 Math.max(currentFrameIndex + direction, 0),
                 frames.length - 1
-            ); // Clamp the index
+            ); // Clamp the index between 0 and the last frame index
 
             if (newFrameIndex !== currentFrameIndex) {
                 currentFrameIndex = newFrameIndex;
@@ -143,10 +146,7 @@
             }
         });
 
-        resetButton.addEventListener('click', () => {
-            currentFrameIndex = 0;
-            resetAnimation();
-        });
+        resetButton.addEventListener('click', resetAnimation);
 
         // Initialize
         resetAnimation();
