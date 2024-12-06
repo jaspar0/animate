@@ -37,6 +37,7 @@
             text-align: left;
             font-family: 'IBM Plex Mono', monospace; /* Use IBM Plex Mono or fallback to monospace */
             font-size: 1rem;
+            padding-left: 10px; /* Add padding to prevent cut-off text */
         }
 
         /* State item */
@@ -158,6 +159,12 @@
             const img = document.createElement('img');
             img.src = `sigil_12_06/sig${i}.png`; // Ensure this path is correct
             img.alt = frameNames[i];
+
+            // Check if the image exists to avoid errors
+            img.onerror = () => {
+                console.error(`Image not found: sigil_12_06/sig${i}.png`);
+                frame.style.display = 'none'; // Hide frame if image is missing
+            };
 
             frame.appendChild(img);
             container.appendChild(frame);
