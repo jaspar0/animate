@@ -45,6 +45,7 @@
             color: black;
             opacity: 0.5; /* Default opacity for inactive states */
             transition: opacity 0.3s ease, transform 0.3s ease;
+            cursor: pointer; /* Make items clickable */
         }
 
         /* Highlighted active state */
@@ -176,6 +177,12 @@
             stateItem.textContent = frameNames[i];
             stateList.appendChild(stateItem);
             stateItems.push(stateItem);
+
+            // Add click event to jump directly to this state
+            stateItem.addEventListener('click', () => {
+                currentFrameIndex = i;
+                updateActiveFrame(i);
+            });
         }
 
         // Add Frame 0 state item to the list
@@ -184,6 +191,12 @@
         frame0StateItem.textContent = frameNames[0];
         stateList.prepend(frame0StateItem);
         stateItems.unshift(frame0StateItem);
+
+        // Add click event to Frame 0
+        frame0StateItem.addEventListener('click', () => {
+            currentFrameIndex = 0;
+            updateActiveFrame(0);
+        });
 
         // Update UI to reflect the active frame
         function updateActiveFrame(frameIndex) {
