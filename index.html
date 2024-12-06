@@ -120,9 +120,9 @@
 
         // Update UI to reflect the active frame
         function updateActiveFrame(frameIndex) {
-            // Update frames
+            // Update frames (cumulative visibility)
             frames.forEach((frame, index) => {
-                frame.style.opacity = index === frameIndex ? '1' : '0';
+                frame.style.opacity = index <= frameIndex ? '1' : '0';
             });
 
             // Update state list
