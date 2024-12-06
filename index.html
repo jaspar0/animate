@@ -126,14 +126,14 @@
         }
 
         function resetAnimation() {
-            currentFrameIndex = 0; // Reset to the first frame
+            currentFrameIndex = -1; // Reset to no frames visible
             frames.forEach(frame => {
                 frame.style.opacity = '0'; // Reset visibility
             });
             updateDebugDisplay();
         }
 
-        let currentFrameIndex = 0; // Track the current frame index
+        let currentFrameIndex = -1; // Track the current frame index; -1 means no frames visible
 
         // Listen to wheel events for forward and backward scrolling
         window.addEventListener('wheel', (event) => {
@@ -142,9 +142,9 @@
             if (Math.abs(scrollDelta) >= scrollThreshold) {
                 const direction = scrollDelta > 0 ? 1 : -1; // Determine direction
                 const newFrameIndex = Math.min(
-                    Math.max(currentFrameIndex + direction, 0),
+                    Math.max(currentFrameIndex + direction, -1), // Allow index to go to -1
                     frames.length - 1
-                ); // Clamp the index between 0 and the last frame index
+                ); // Clamp the index between -1 and the last frame index
 
                 if (newFrameIndex !== currentFrameIndex) {
                     currentFrameIndex = newFrameIndex;
@@ -156,7 +156,6 @@
         });
 
         resetButton.addEventListener('click', () => {
-            currentFrameIndex = 0;
             resetAnimation();
         });
 
