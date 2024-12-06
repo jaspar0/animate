@@ -167,4 +167,49 @@
                 }
             });
 
-            // Update state
+            // Update state list
+            stateItems.forEach((item, index) => {
+                if (index === frameIndex) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Center the active state in the list
+            const activeItem = stateItems[frameIndex];
+            if (activeItem) {
+                const listHeight = stateList.offsetHeight;
+                const itemOffset = activeItem.offsetTop - listHeight / 2 + activeItem.offsetHeight / 2;
+                stateList.scrollTop = itemOffset;
+            }
+        }
+
+        // Handle infinite scroll logic
+        window.addEventListener('wheel', (event) => {
+            scrollDelta += event.deltaY; // Accumulate scroll values
+
+            if (Math.abs(scrollDelta) >= scrollThreshold) {
+                const direction = scrollDelta > 0 ? 1 : -1; // Determine direction
+                let newFrameIndex = currentFrameIndex + direction;
+
+                // Infinite scrolling logic
+                if (newFrameIndex > frames.length - 1) {
+                    newFrameIndex = 0; // Wrap forward to Frame 0
+                } else if (newFrameIndex < 0) {
+                    newFrameIndex = frames.length - 1; // Wrap backward to Frame 20
+                }
+
+                // Update the frame index and UI
+                currentFrameIndex = newFrameIndex;
+                updateActiveFrame(currentFrameIndex);
+
+                scrollDelta = 0; // Reset scroll delta
+            }
+        });
+
+        // Initialize
+        updateActiveFrame(0); // Start with Frame 0 (No Frame Active)
+    </script>
+</body>
+</html>
