@@ -1,20 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progressive Frame Reveal</title>
     <style>
-        body {
+        html, body {
             margin: 0;
-            height: 500vh; /* Increased for finer scroll control */
-            background: transparent;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent default scrolling behavior */
         }
 
-        .container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: transparent;
+        body {
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .animation-container {
+            position: relative;
+            width: 80vw;
+            height: 80vh;
+            background: white;
+            border: 2px solid #ccc;
         }
 
         .frame {
@@ -24,7 +35,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.3s ease; /* Slightly longer transition */
+            transition: opacity 0.3s ease-in-out;
         }
 
         .frame img {
@@ -32,114 +43,34 @@
             height: 100%;
             object-fit: contain;
         }
-
-        .debug {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            font-family: monospace;
-            z-index: 1000;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .progress-bar {
-            position: fixed;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 4px;
-            background: rgba(200, 200, 200, 0.5);
-            border-radius: 2px;
-            z-index: 1000;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 2px;
-            transition: width 0.2s ease;
-        }
     </style>
 </head>
 <body>
-    <div class="debug">Visible Frames: none</div>
-    <div class="progress-bar">
-        <div class="progress-fill"></div>
-    </div>
-    <div class="container">
-        <!-- Frames will be generated here -->
-    </div>
+    <div class="animation-container" id="animation-container"></div>
 
     <script>
-        const container = document.querySelector('.container');
-        const debug = document.querySelector('.debug');
-        const progressFill = document.querySelector('.progress-fill');
-        const frames = [];
         const totalFrames = 20;
-        let currentFrame = 0;
-        let lastScrollPosition = 0;
-        let ticking = false;
+        const animationContainer = document.getElementById('animation-container');
+        let currentFrame = 0; // Tracks how many frames are currently visible
 
-        // Create frames
-        for (let i = 0; i < totalFrames; i++) {
+        // Generate frames
+        for (let i = 1; i <= totalFrames; i++) {
             const frame = document.createElement('div');
-            frame.className = 'frame';
-            frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
-            container.appendChild(frame);
-            frames.push(frame);
+            frame.classList.add('frame');
+            frame.innerHTML = `<img src="sigil_12_06/sig${i}.png" alt="Frame ${i}">`;
+            animationContainer.appendChild(frame);
         }
 
-        function updateFrames(scrollPercent) {
-            // Calculate target frame with smoother progression
-            const targetFrame = Math.min(
-                Math.floor(scrollPercent * (totalFrames + 1)),
-                totalFrames
-            );
+        const frames = document.querySelectorAll('.frame');
 
-            // Only update if moving forward
-            if (targetFrame > currentFrame) {
-                // Update frame visibility
-                frames.forEach((frame, index) => {
-                    if (index < targetFrame) {
-                        frame.style.opacity = '1';
-                    }
-                });
-
-                // Update progress bar
-                const progress = (targetFrame / totalFrames) * 100;
-                progressFill.style.width = `${progress}%`;
-
-                // Update debug text
-                if (targetFrame === 0) {
-                    debug.textContent = 'Visible Frames: none';
-                } else {
-                    debug.textContent = `Visible Frames: 1-${targetFrame}`;
-                }
-
-                currentFrame = targetFrame;
+        // Handle scroll events
+        window.addEventListener('wheel', (event) => {
+            if (event.deltaY > 0 && currentFrame < totalFrames) {
+                // Forward scroll: Show the next frame
+                frames[currentFrame].style.opacity = 1;
+                currentFrame++;
             }
-
-            ticking = false;
-        }
-
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-                    updateFrames(scrollPercent);
-                });
-                ticking = true;
-            }
-        }, { passive: true });
-
-        // Initial state
-        updateFrames(0);
+        });
     </script>
 </body>
 </html>
