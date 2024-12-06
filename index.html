@@ -60,17 +60,36 @@
             border-radius: 4px;
             max-width: 80vw;
         }
+
+        .reset-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: monospace;
+            z-index: 1000;
+        }
+
+        .reset-button:hover {
+            background: rgba(240, 240, 240, 0.9);
+        }
     </style>
 </head>
 <body>
     <div class="debug">Scroll Progress: 0%</div>
     <div class="frame-status">Frames Active: None</div>
+    <button class="reset-button">Reset Animation</button>
     <div class="container"></div>
 
     <script>
         const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
         const frameStatus = document.querySelector('.frame-status');
+        const resetButton = document.querySelector('.reset-button');
         const frames = [];
         const activeFrames = new Set();
 
@@ -79,7 +98,6 @@
             const frame = document.createElement('div');
             frame.className = 'frame';
             frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
-            // Store the frame's index for debugging
             frame.dataset.frameIndex = i;
             container.appendChild(frame);
             frames.push(frame);
@@ -101,6 +119,25 @@
             updateDisplay();
         }
 
+        function resetAnimation() {
+            // Reset scroll position
+            window.scrollTo(0, 0);
+            
+            // Reset all frames to invisible
+            frames.forEach(frame => {
+                frame.style.opacity = '0';
+            });
+            
+            // Clear active frames set
+            activeFrames.clear();
+            
+            // Reset displays
+            debug.textContent = 'Scroll Progress: 0%';
+            updateDisplay();
+            
+            console.log('Animation reset');
+        }
+
         window.addEventListener('scroll', () => {
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
             const frameToShow = Math.min(Math.floor(scrollPercent * 20), 19);
@@ -109,8 +146,11 @@
             activateFramesUpTo(frameToShow);
         });
 
-        // Show first frame initially
-        activateFramesUpTo(0);
+        // Add reset button functionality
+        resetButton.addEventListener('click', resetAnimation);
+
+        // Initial state
+        resetAnimation();
     </script>
 </body>
 </html>
