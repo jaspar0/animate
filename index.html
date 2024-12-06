@@ -30,17 +30,17 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
-            width: 15%; /* Fixed width for the state list */
+            align-items: flex-start; /* Left-align the text */
+            width: 15%; /* Default width for the state list */
             height: 100%;
             overflow: hidden;
-            text-align: center;
+            text-align: left;
+            font-family: 'IBM Plex Mono', monospace; /* Use IBM Plex Mono or fallback to monospace */
+            font-size: 1rem;
         }
 
         /* State item */
         .state-item {
-            font-family: IBM Plex Mono;
-            font-size: 1.2rem;
             color: black;
             opacity: 0.5; /* Default opacity for inactive states */
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -49,7 +49,7 @@
         /* Highlighted active state */
         .state-item.active {
             opacity: 1; /* Full opacity for the active state */
-            transform: scale(1.2); /* Slightly larger size for emphasis */
+            transform: scale(1.1); /* Slightly larger size for emphasis */
         }
 
         /* PNG container */
@@ -77,6 +77,28 @@
             width: 100%; /* Fill the container width */
             height: 100%; /* Fill the container height */
             object-fit: contain; /* Maintain aspect ratio */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .state-list {
+                width: 12%; /* Shrink the state list width */
+                font-size: 0.9rem; /* Smaller font size */
+            }
+        }
+
+        @media (max-width: 900px) {
+            .state-list {
+                width: 10%; /* Further shrink state list width */
+                font-size: 0.8rem; /* Smaller font size */
+            }
+        }
+
+        @media (max-width: 600px) {
+            .state-list {
+                width: 8%; /* Minimized state list width */
+                font-size: 0.7rem; /* Further reduce font size */
+            }
         }
     </style>
 </head>
