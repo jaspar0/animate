@@ -1,32 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flipbook Animation</title>
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* Prevent overscrolling */
-        }
-
         body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f0f0f0;
+            margin: 0;
+            height: 300vh; /* Gives us room to scroll */
+            background: black;
         }
 
-        .animation-container {
-            position: relative;
-            width: 80vw;
-            height: 80vh;
-            background: white;
-            overflow: hidden;
-            border: 2px solid #ccc;
+        .container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
         }
 
         .frame {
@@ -36,7 +23,6 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.2s ease-in-out;
         }
 
         .frame img {
@@ -45,76 +31,46 @@
             object-fit: contain;
         }
 
-        .scroll-progress {
+        .debug {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-family: Arial, sans-serif;
+            background: white;
+            padding: 10px;
+            font-family: monospace;
             z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <div class="scroll-progress">Frame: 1/20</div>
-    <div class="animation-container">
-        <div id="frames-container"></div>
+    <div class="debug">Current Frame: 0</div>
+    <div class="container">
+        <!-- Generate 20 frames -->
     </div>
 
     <script>
-        const totalFrames = 20;
-        const framesContainer = document.getElementById('frames-container');
-        const progressElement = document.querySelector('.scroll-progress');
-        let currentFrame = 0; // Start at frame 1
+        const container = document.querySelector('.container');
+        const debug = document.querySelector('.debug');
+        let currentFrame = 0;
 
-        // Generate frames
-        for (let i = 1; i <= totalFrames; i++) {
+        // Create frames
+        for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
-            frame.classList.add('frame');
-            frame.innerHTML = `<img src="sigil_12_06/sig${i}.png" alt="Frame ${i}">`;
-            framesContainer.appendChild(frame);
+            frame.className = 'frame';
+            frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
+            container.appendChild(frame);
         }
 
-        const frames = document.querySelectorAll('.frame');
-
-        // Ensure only the first frame is initially visible
-        frames[0].style.opacity = 1;
-
-        // Update frames based on direction
-        const updateFrames = (direction) => {
-            if (direction === 'forward' && currentFrame < totalFrames - 1) {
-                currentFrame++;
-                frames[currentFrame].style.opacity = 1; // Make the next frame visible
-            } else if (direction === 'backward' && currentFrame > 0) {
-                frames[currentFrame].style.opacity = 0; // Make the current frame invisible
-                currentFrame--;
+        // Simple scroll handler
+        window.addEventListener('scroll', () => {
+            const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            const newFrame = Math.min(Math.floor(scrollPercent * 20) + 1, 20);
+            
+            if (newFrame > currentFrame) {
+                currentFrame = newFrame;
+                debug.textContent = `Current Frame: ${currentFrame}`;
             }
-            progressElement.textContent = `Frame: ${currentFrame + 1}/${totalFrames}`;
-        };
-
-        // Handle scroll events
-        let isScrolling = false; // Prevent rapid-fire scrolling
-
-        window.addEventListener('wheel', (event) => {
-            if (isScrolling) return; // Block rapid scroll actions
-            isScrolling = true;
-
-            if (event.deltaY > 0) {
-                // Scrolling forward
-                updateFrames('forward');
-            } else if (event.deltaY < 0) {
-                // Scrolling backward
-                updateFrames('backward');
-            }
-
-            // Reset scrolling lock after a short delay
-            setTimeout(() => {
-                isScrolling = false;
-            }, 150);
         });
     </script>
 </body>
