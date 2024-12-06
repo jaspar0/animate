@@ -95,24 +95,24 @@
 
         const frames = document.querySelectorAll('.frame');
         let currentFrame = 0;
-        
-        // Make first frame visible initially
+
+        // Make the first frame visible initially
         frames[0].style.opacity = 1;
 
         // Handle scroll events
         window.addEventListener('scroll', () => {
-            // Calculate current frame based on scroll position
+            // Calculate the new frame based on scroll position
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
             const newFrame = Math.min(Math.floor(scrollPercent * totalFrames), totalFrames - 1);
             
             if (newFrame !== currentFrame) {
                 if (newFrame > currentFrame) {
-                    // Scrolling forward: make all frames up to the new frame visible
+                    // Scrolling forward: Make all layers up to newFrame visible
                     for (let i = currentFrame + 1; i <= newFrame; i++) {
                         frames[i].style.opacity = 1;
                     }
                 } else {
-                    // Scrolling backward: hide frames beyond the new frame
+                    // Scrolling backward: Make all layers after newFrame invisible
                     for (let i = currentFrame; i > newFrame; i--) {
                         frames[i].style.opacity = 0;
                     }
