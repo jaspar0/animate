@@ -4,7 +4,7 @@
     <style>
         body {
             margin: 0;
-            height: 500vh;
+            height: 500vh; /* Allow for scroll testing */
             background: transparent;
         }
 
@@ -13,37 +13,32 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90vw;
-            height: 90vh;
+            width: auto; /* Match the size of the images */
+            height: auto; /* Match the size of the images */
             background: transparent;
         }
 
         .frame {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
             opacity: 0;
             transition: opacity 0.2s ease-in-out;
-            pointer-events: none; /* Prevent interaction */
         }
 
-        /* Dynamic image scaling */
         .frame img {
-            width: 100%; /* Scale images proportionally */
-            height: 100%;
-            object-fit: contain; /* Keep aspect ratio */
-            display: block;
+            display: block; /* Removes any extra space below images */
+            max-width: 100%; /* Ensure image fits inside its parent */
+            max-height: 100%; /* Maintain aspect ratio */
         }
 
-        /* Debug UI */
         .debug {
             position: fixed;
             top: 20px;
             left: 20px;
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
-            z-index: 2000;
+            z-index: 2000; /* Above all frames */
             font-family: monospace;
             border-radius: 4px;
         }
@@ -76,7 +71,7 @@
         const resetButton = document.querySelector('.reset-button');
         const frames = [];
 
-        // Create 20 frames with progressively smaller sizes
+        // Create 20 frames
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
@@ -85,8 +80,6 @@
             const img = document.createElement('img');
             img.src = `sigil_12_06/sig${i + 1}.png`;
             img.alt = `Frame ${i + 1}`;
-            img.style.width = `${90 - i * 5}%`; // Progressive scaling
-            img.style.height = `${90 - i * 5}%`; // Maintain aspect ratio
             
             frame.appendChild(img);
             container.appendChild(frame);
