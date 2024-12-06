@@ -13,46 +13,50 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 500px;
-            height: 500px;
+            width: 90vw; /* Make container bigger */
+            height: 90vh;
             border: 2px solid black;
             background: white;
         }
 
+        /* Remove transform from .frame class */
         .frame {
             position: absolute;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            /* Center each frame */
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.2s ease;
+            /* Add border to clearly see boundaries */
+            border: 3px solid black;
         }
 
-        /* Different sizes and colors for each frame */
+        /* Very distinct sizes */
         #frame1 {
-            width: 400px;
-            height: 400px;
+            width: 80vh;  /* Much bigger */
+            height: 80vh;
             background-color: rgba(255, 0, 0, 0.5);
             z-index: 1;
         }
 
         #frame2 {
-            width: 300px;
-            height: 300px;
+            width: 60vh;  /* Big */
+            height: 60vh;
             background-color: rgba(0, 255, 0, 0.5);
             z-index: 2;
         }
 
         #frame3 {
-            width: 200px;
-            height: 200px;
+            width: 40vh;  /* Medium */
+            height: 40vh;
             background-color: rgba(0, 0, 255, 0.5);
             z-index: 3;
         }
 
         #frame4 {
-            width: 100px;
-            height: 100px;
+            width: 20vh;  /* Small */
+            height: 20vh;
             background-color: rgba(255, 255, 0, 0.5);
             z-index: 4;
         }
@@ -105,7 +109,9 @@
             let debugContent = 'Real-time Frame States:\n';
             frames.forEach((frame, index) => {
                 const opacity = frame.style.opacity || '0';
+                const size = frame.getBoundingClientRect();
                 debugContent += `Frame ${index + 1}: ${opacity === '1' ? 'VISIBLE' : 'hidden'} (opacity: ${opacity})\n`;
+                debugContent += `   Size: ${Math.round(size.width)}x${Math.round(size.height)}px\n`;
             });
             debug.textContent = debugContent;
         }
