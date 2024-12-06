@@ -74,7 +74,7 @@
     </style>
 </head>
 <body>
-    <div class="debug">Scroll to activate or deactivate frames with infinity scrolling.</div>
+    <div class="debug">Scroll to activate or deactivate frames with momentum.</div>
     <button class="reset-button">Reset Animation</button>
     <div class="container"></div>
 
@@ -84,11 +84,11 @@
         const resetButton = document.querySelector('.reset-button');
         const frames = [];
 
-        const scrollThreshold = 100; // Adjust this value to change scrolling sensitivity
+        const scrollThreshold = 100; // Sensitivity for scroll progression
+        const momentumThreshold = 300; // Time in ms to detect a break in scrolling
         let scrollDelta = 0; // Accumulated scroll value
-        let lastScrollTime = Date.now(); // Track the last scroll event time
-        const momentumThreshold = 300; // Time in ms to detect breaks in scrolling
-        let momentumDirection = 0; // Track the current scrolling momentum direction (-1 or 1)
+        let lastScrollTime = Date.now(); // Timestamp of the last scroll event
+        let isMomentumAllowed = false; // Whether momentum scrolling is currently active
 
         // Create 20 frames
         for (let i = 0; i < 20; i++) {
@@ -133,19 +133,20 @@
             frames.forEach(frame => {
                 frame.style.opacity = '0'; // Reset visibility
             });
+            isMomentumAllowed = false; // Reset momentum
             updateDebugDisplay();
         }
 
         let currentFrameIndex = -1; // Track the current frame index; -1 means no frames visible
 
-        // Handle infinity scrolling with momentum and bouncing
+        // Handle scrolling with bouncing and momentum
         window.addEventListener('wheel', (event) => {
             const now = Date.now();
             const timeSinceLastScroll = now - lastScrollTime;
 
+            // Reset momentum if there's a pause
             if (timeSinceLastScroll > momentumThreshold) {
-                // Reset momentum if there's a break in scrolling
-                momentumDirection = 0;
+                isMomentumAllowed = false;
             }
 
             scrollDelta += event.deltaY; // Accumulate scroll values
@@ -153,30 +154,33 @@
             if (Math.abs(scrollDelta) >= scrollThreshold) {
                 const direction = scrollDelta > 0 ? 1 : -1; // Determine direction
 
-                // Update momentum direction
-                if (momentumDirection === 0 || momentumDirection === direction) {
-                    momentumDirection = direction;
-                } else {
-                    // Bounce back when crossing the boundaries
-                    if (currentFrameIndex === -1) {
-                        momentumDirection = 1; // Bounce back to frame 0
-                    } else if (currentFrameIndex === frames.length - 1) {
-                        momentumDirection = -1; // Bounce back to frame 19
+                let newFrameIndex = currentFrameIndex + direction;
+
+                // Check for boundary conditions
+                if (newFrameIndex > frames.length - 1) {
+                    if (isMomentumAllowed) {
+                        // Allow continuation to frame 0
+                        newFrameIndex = 0;
+                    } else {
+                        // Bounce back to frame 19
+                        newFrameIndex = frames.length - 2;
                     }
-                }
-
-                // Calculate new frame index with momentum and bouncing
-                let newFrameIndex = currentFrameIndex + momentumDirection;
-
-                if (newFrameIndex < -1) {
-                    newFrameIndex = frames.length - 1; // Bounce to last frame
-                } else if (newFrameIndex > frames.length - 1) {
-                    newFrameIndex = -1; // Bounce to no frames visible
+                } else if (newFrameIndex < -1) {
+                    if (isMomentumAllowed) {
+                        // Allow continuation to frame 20
+                        newFrameIndex = frames.length - 1;
+                    } else {
+                        // Bounce back to frame 0
+                        newFrameIndex = 0;
+                    }
                 }
 
                 // Update frame index and visibility
                 currentFrameIndex = newFrameIndex;
                 activateFramesUpTo(currentFrameIndex);
+
+                // Enable momentum scrolling if no break
+                isMomentumAllowed = true;
 
                 scrollDelta = 0; // Reset scroll delta
             }
