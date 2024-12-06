@@ -2,6 +2,7 @@
 <html>
 <head>
     <style>
+        /* Same styles as before */
         body {
             margin: 0;
             height: 500vh;
@@ -79,17 +80,27 @@
         const resetButton = document.querySelector('.reset-button');
         const frames = [];
         
-        // Create frames with proper stacking
+        // Create frames with the correct image path
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
             frame.id = `frame${i + 1}`;
-            frame.style.zIndex = i + 1; // Ensure proper stacking
-            frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
+            frame.style.zIndex = i + 1;
+            
+            // Using the correct file naming convention
+            frame.innerHTML = `
+                <img 
+                    src="./sigil_12_06/sig${i + 1}.png" 
+                    onload="console.log('Image ${i + 1} loaded')" 
+                    onerror="console.error('Failed to load image ${i + 1}')"
+                >
+            `;
+            
             container.appendChild(frame);
             frames.push(frame);
         }
 
+        // Rest of the code remains the same
         function updateDebugDisplay() {
             let debugContent = 'Real-time Frame States:\n';
             frames.forEach((frame, index) => {
@@ -129,7 +140,6 @@
 
         resetButton.addEventListener('click', resetAnimation);
 
-        // Initialize
         resetAnimation();
     </script>
 </body>
