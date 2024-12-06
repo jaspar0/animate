@@ -74,7 +74,7 @@
     </style>
 </head>
 <body>
-    <div class="debug">Scroll to activate or deactivate frames.</div>
+    <div class="debug">Scroll to activate or deactivate frames with infinity scrolling.</div>
     <button class="reset-button">Reset Animation</button>
     <div class="container"></div>
 
@@ -86,6 +86,9 @@
 
         const scrollThreshold = 100; // Adjust this value to change scrolling sensitivity
         let scrollDelta = 0; // Accumulated scroll value
+        let lastScrollTime = Date.now(); // Track the last scroll event time
+        const momentumThreshold = 300; // Time in ms to detect breaks in scrolling
+        let momentumDirection = 0; // Track the current scrolling momentum direction (-1 or 1)
 
         // Create 20 frames
         for (let i = 0; i < 20; i++) {
@@ -135,24 +138,50 @@
 
         let currentFrameIndex = -1; // Track the current frame index; -1 means no frames visible
 
-        // Listen to wheel events for forward and backward scrolling
+        // Handle infinity scrolling with momentum and bouncing
         window.addEventListener('wheel', (event) => {
+            const now = Date.now();
+            const timeSinceLastScroll = now - lastScrollTime;
+
+            if (timeSinceLastScroll > momentumThreshold) {
+                // Reset momentum if there's a break in scrolling
+                momentumDirection = 0;
+            }
+
             scrollDelta += event.deltaY; // Accumulate scroll values
 
             if (Math.abs(scrollDelta) >= scrollThreshold) {
                 const direction = scrollDelta > 0 ? 1 : -1; // Determine direction
-                const newFrameIndex = Math.min(
-                    Math.max(currentFrameIndex + direction, -1), // Allow index to go to -1
-                    frames.length - 1
-                ); // Clamp the index between -1 and the last frame index
 
-                if (newFrameIndex !== currentFrameIndex) {
-                    currentFrameIndex = newFrameIndex;
-                    activateFramesUpTo(currentFrameIndex);
+                // Update momentum direction
+                if (momentumDirection === 0 || momentumDirection === direction) {
+                    momentumDirection = direction;
+                } else {
+                    // Bounce back when crossing the boundaries
+                    if (currentFrameIndex === -1) {
+                        momentumDirection = 1; // Bounce back to frame 0
+                    } else if (currentFrameIndex === frames.length - 1) {
+                        momentumDirection = -1; // Bounce back to frame 19
+                    }
                 }
 
-                scrollDelta = 0; // Reset the scroll delta after changing frames
+                // Calculate new frame index with momentum and bouncing
+                let newFrameIndex = currentFrameIndex + momentumDirection;
+
+                if (newFrameIndex < -1) {
+                    newFrameIndex = frames.length - 1; // Bounce to last frame
+                } else if (newFrameIndex > frames.length - 1) {
+                    newFrameIndex = -1; // Bounce to no frames visible
+                }
+
+                // Update frame index and visibility
+                currentFrameIndex = newFrameIndex;
+                activateFramesUpTo(currentFrameIndex);
+
+                scrollDelta = 0; // Reset scroll delta
             }
+
+            lastScrollTime = now; // Update last scroll time
         });
 
         resetButton.addEventListener('click', () => {
