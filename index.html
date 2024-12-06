@@ -39,38 +39,24 @@
         .debug {
             position: fixed;
             top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 20px;
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
             z-index: 1000;
             font-family: monospace;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        .frame-status {
-            position: fixed;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            z-index: 1000;
-            font-family: monospace;
-            border-radius: 4px;
-            max-width: 80vw;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* Updated Reset Button Styles */
         .reset-button {
             position: fixed;
-            bottom: 20px; /* Moved to bottom */
-            left: 50%; /* Centered horizontally */
+            bottom: 20px;
+            left: 50%;
             transform: translateX(-50%);
             padding: 12px 24px;
-            background: #2196F3; /* Blue background */
+            background: #2196F3;
             color: white;
             border: none;
             border-radius: 4px;
@@ -80,96 +66,119 @@
             font-weight: bold;
             z-index: 1000;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
         }
 
         .reset-button:hover {
             background: #1976D2;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transform: translateX(-50%) translateY(-2px);
         }
 
-        .reset-button:active {
-            background: #1565C0;
-            transform: translateX(-50%) translateY(0px);
+        /* Style for frame state display */
+        .state-row {
+            display: flex;
+            gap: 10px;
+            margin: 2px 0;
+        }
+
+        .state-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .state-on {
+            background: #4CAF50;
+        }
+
+        .state-off {
+            background: #f44336;
         }
     </style>
 </head>
 <body>
-    <div class="debug">Scroll Progress: 0%</div>
-    <div class="frame-status">Frames Active: None</div>
+    <div class="debug">Real-time Frame States:</div>
     <button class="reset-button">Reset Animation</button>
     <div class="container"></div>
 
     <script>
         const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
-        const frameStatus = document.querySelector('.frame-status');
         const resetButton = document.querySelector('.reset-button');
         const frames = [];
-        const activeFrames = new Set();
 
         // Create frames
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
+            frame.id = `frame${i + 1}`;
             frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
-            frame.dataset.frameIndex = i;
             container.appendChild(frame);
             frames.push(frame);
         }
 
-        function updateDisplay() {
-            const activeList = Array.from(activeFrames).map(i => i + 1).join(', ');
-            frameStatus.textContent = `Frames Active: ${activeList || 'None'}`;
+        function getActualFrameStates() {
+            return frames.map(frame => {
+                return {
+                    id: frame.id,
+                    opacity: parseFloat(frame.style.opacity) || 0
+                };
+            });
+        }
+
+        function updateDebugDisplay() {
+            const states = getActualFrameStates();
+            let debugContent = 'Real-time Frame States:\n';
+            
+            states.forEach(({id, opacity}, index) => {
+                const isVisible = opacity > 0;
+                debugContent += `
+                    <div class="state-row">
+                        <span class="state-indicator ${isVisible ? 'state-on' : 'state-off'}"></span>
+                        Frame ${index + 1}: ${isVisible ? 'VISIBLE' : 'hidden'} (opacity: ${opacity})
+                    </div>
+                `;
+            });
+            
+            debug.innerHTML = debugContent;
         }
 
         function activateFramesUpTo(frameIndex) {
-            for (let i = 0; i <= frameIndex; i++) {
-                if (!activeFrames.has(i)) {
-                    console.log(`Activating frame ${i + 1}`);
-                    frames[i].style.opacity = '1';
-                    activeFrames.add(i);
-                }
-            }
-            updateDisplay();
+            console.log(`Setting frames up to ${frameIndex} visible`);
+            frames.forEach((frame, index) => {
+                // Make all frames up to frameIndex visible
+                frame.style.opacity = index <= frameIndex ? '1' : '0';
+            });
+            updateDebugDisplay();
         }
 
         function resetAnimation() {
-            // Reset scroll position
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
             
-            // Reset all frames to invisible
             frames.forEach(frame => {
                 frame.style.opacity = '0';
             });
             
-            // Clear active frames set
-            activeFrames.clear();
-            
-            // Reset displays
-            debug.textContent = 'Scroll Progress: 0%';
-            updateDisplay();
-            
+            updateDebugDisplay();
             console.log('Animation reset');
         }
 
         window.addEventListener('scroll', () => {
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
             const frameToShow = Math.min(Math.floor(scrollPercent * 20), 19);
-            
-            debug.textContent = `Scroll Progress: ${(scrollPercent * 100).toFixed(1)}%`;
             activateFramesUpTo(frameToShow);
         });
 
-        // Add reset button functionality
         resetButton.addEventListener('click', resetAnimation);
 
-        // Initial state
+        // Initialize
         resetAnimation();
+        
+        // Update debug display periodically to catch any changes
+        setInterval(updateDebugDisplay, 100);
     </script>
 </body>
 </html>
