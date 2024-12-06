@@ -84,6 +84,9 @@
         const resetButton = document.querySelector('.reset-button');
         const frames = [];
 
+        const scrollThreshold = 100; // Adjust this value to change scrolling sensitivity
+        let scrollDelta = 0; // Accumulated scroll value
+
         // Create 20 frames
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
@@ -134,19 +137,28 @@
 
         // Listen to wheel events for forward and backward scrolling
         window.addEventListener('wheel', (event) => {
-            const direction = event.deltaY > 0 ? 1 : -1; // Scroll direction
-            const newFrameIndex = Math.min(
-                Math.max(currentFrameIndex + direction, 0),
-                frames.length - 1
-            ); // Clamp the index between 0 and the last frame index
+            scrollDelta += event.deltaY; // Accumulate scroll values
 
-            if (newFrameIndex !== currentFrameIndex) {
-                currentFrameIndex = newFrameIndex;
-                activateFramesUpTo(currentFrameIndex);
+            if (Math.abs(scrollDelta) >= scrollThreshold) {
+                const direction = scrollDelta > 0 ? 1 : -1; // Determine direction
+                const newFrameIndex = Math.min(
+                    Math.max(currentFrameIndex + direction, 0),
+                    frames.length - 1
+                ); // Clamp the index between 0 and the last frame index
+
+                if (newFrameIndex !== currentFrameIndex) {
+                    currentFrameIndex = newFrameIndex;
+                    activateFramesUpTo(currentFrameIndex);
+                }
+
+                scrollDelta = 0; // Reset the scroll delta after changing frames
             }
         });
 
-        resetButton.addEventListener('click', resetAnimation);
+        resetButton.addEventListener('click', () => {
+            currentFrameIndex = 0;
+            resetAnimation();
+        });
 
         // Initialize
         resetAnimation();
