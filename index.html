@@ -17,20 +17,18 @@
             background: transparent;
         }
 
-        /* Each frame stays exactly where it is, stacked on top of each other */
         .frame {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0; /* Start with light off */
+            opacity: 0;
             transition: opacity 0.3s ease;
-            z-index: 1; /* Stack frames */
         }
 
-        .frame.on {
-            opacity: 1; /* Light on! */
+        .frame.visible {
+            opacity: 1;
         }
 
         .frame img {
@@ -53,41 +51,49 @@
     </style>
 </head>
 <body>
-    <div class="debug">Lights On: none</div>
-    <div class="container">
-        <!-- Our hallway of light switches -->
-    </div>
+    <div class="debug">Lights On: 0/20</div>
+    <div class="container"></div>
 
     <script>
         const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
-        let lightsOn = 0;
-
-        // Install our 20 lights
-        for (let i = 0; i < 20; i++) {
+        
+        // Keep track of which frames are visible
+        const visibleFrames = new Set();
+        
+        // Create all frames
+        const frames = Array.from({ length: 20 }, (_, i) => {
             const frame = document.createElement('div');
             frame.className = 'frame';
             frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
             container.appendChild(frame);
-        }
+            return frame;
+        });
 
-        const frames = document.querySelectorAll('.frame');
-
-        // Our scroll handler turns on lights one by one
+        // Simple scroll handler that only turns lights on
         window.addEventListener('scroll', () => {
-            // Calculate which light switch we've reached
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            const switchToFlip = Math.min(Math.floor(scrollPercent * 20), 19); // 0-19 for array index
+            const frameToShow = Math.min(Math.floor(scrollPercent * 20), 19);
 
-            // If we've reached a new switch, turn it on!
-            if (switchToFlip >= lightsOn) {
-                // Turn on all lights up to this point
-                for (let i = 0; i <= switchToFlip; i++) {
-                    frames[i].classList.add('on');
-                }
-                lightsOn = switchToFlip + 1;
-                debug.textContent = `Lights On: 1-${lightsOn}`;
+            // If this frame isn't visible yet, make it visible
+            if (!visibleFrames.has(frameToShow)) {
+                frames[frameToShow].classList.add('visible');
+                visibleFrames.add(frameToShow);
+                debug.textContent = `Lights On: ${visibleFrames.size}/20`;
             }
+        });
+
+        // Log when frames become visible (for debugging)
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.classList.contains('visible')) {
+                    console.log(`Frame ${frames.indexOf(mutation.target)} is now visible`);
+                }
+            });
+        });
+
+        frames.forEach(frame => {
+            observer.observe(frame, { attributes: true });
         });
     </script>
 </body>
