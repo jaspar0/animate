@@ -14,7 +14,6 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            pointer-events: none;
         }
 
         .frame {
@@ -23,16 +22,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Start completely invisible */
             opacity: 0;
-            /* Smooth transition when becoming visible */
-            transition: opacity 0.3s ease;
-        }
-
-        .frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
         }
 
         .debug {
@@ -40,49 +30,76 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.8);
+            background: white;
             padding: 10px;
-            font-family: monospace;
             z-index: 1000;
+            font-family: monospace;
+        }
+
+        .frame-status {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: white;
+            padding: 10px;
+            z-index: 1000;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
-    <div class="debug">Frame: 0/20</div>
+    <div class="debug">Scroll Progress: 0%</div>
+    <div class="frame-status">Frame Status</div>
     <div class="container"></div>
 
     <script>
         const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
-        let highestFrameShown = 0;
-        
-        // Create all 20 frames
+        const frameStatus = document.querySelector('.frame-status');
+        const frames = [];
+        const frameStates = new Array(20).fill(false);  // Track each frame's visibility
+
+        // Create frames
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
             frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
             container.appendChild(frame);
+            frames.push(frame);
         }
 
-        // Get all frames
-        const frames = document.querySelectorAll('.frame');
+        function updateFrameStatus() {
+            let status = 'Frame Status:\n';
+            frameStates.forEach((isVisible, i) => {
+                status += `Frame ${i + 1}: ${isVisible ? 'ON' : 'off'}\n`;
+            });
+            frameStatus.textContent = status;
+        }
 
-        // On scroll, just make frames visible
+        function showFrame(frameIndex) {
+            if (frameIndex >= 0 && frameIndex < 20 && !frameStates[frameIndex]) {
+                console.log(`Turning ON frame ${frameIndex + 1}`);
+                frames[frameIndex].style.opacity = '1';
+                frameStates[frameIndex] = true;
+                updateFrameStatus();
+            }
+        }
+
+        // Simple scroll handler
         window.addEventListener('scroll', () => {
-            // Calculate what frame we should be at
-            const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            const currentFrame = Math.min(Math.floor(scrollProgress * 20), 20);
+            const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            const frameToShow = Math.floor(scrollPercent * 20);
             
-            // If we've reached a new highest frame, show it
-            if (currentFrame > highestFrameShown) {
-                // Show all frames up to current
-                for (let i = 0; i <= currentFrame; i++) {
-                    frames[i].style.opacity = '1';
-                }
-                highestFrameShown = currentFrame;
-                debug.textContent = `Frames visible: 1-${currentFrame + 1}`;
+            debug.textContent = `Scroll Progress: ${(scrollPercent * 100).toFixed(1)}%`;
+
+            // Show all frames up to current frame
+            for (let i = 0; i <= frameToShow && i < 20; i++) {
+                showFrame(i);
             }
         });
+
+        // Initial status display
+        updateFrameStatus();
     </script>
 </body>
 </html>
