@@ -12,29 +12,29 @@
         }
 
         .container {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: auto;
-            height: auto;
+            width: auto; /* Match the size of the images */
+            height: auto; /* Match the size of the images */
         }
 
         .frame {
             position: absolute;
             top: 0;
             left: 0;
-            width: 500px; /* Replace with your PNG dimensions */
-            height: 500px; /* Replace with your PNG dimensions */
+            width: auto;
+            height: auto;
             opacity: 0;
             transition: opacity 0.2s ease-in-out;
         }
 
         .frame img {
             display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            max-width: 90vw; /* Scale to fit the viewport width */
+            max-height: 90vh; /* Scale to fit the viewport height */
+            object-fit: contain; /* Maintain the aspect ratio */
         }
 
         .debug {
