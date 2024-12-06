@@ -34,30 +34,22 @@
             padding: 10px;
             z-index: 1000;
             font-family: monospace;
-        }
-
-        .frame-status {
-            position: fixed;
-            right: 20px;
-            top: 20px;
-            background: white;
-            padding: 10px;
-            z-index: 1000;
-            font-family: monospace;
+            white-space: pre-line;  /* Allow line breaks in text */
+            max-height: 80vh;       /* Limit height */
+            overflow-y: auto;       /* Scrollable if too long */
+            border: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
-    <div class="debug">Scroll Progress: 0%</div>
-    <div class="frame-status">Frame Status</div>
+    <div class="debug">Activated Frames:</div>
     <div class="container"></div>
 
     <script>
         const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
-        const frameStatus = document.querySelector('.frame-status');
+        const activatedFrames = new Set();  // Keep track of activated frames
         const frames = [];
-        const frameStates = new Array(20).fill(false);  // Track each frame's visibility
 
         // Create frames
         for (let i = 0; i < 20; i++) {
@@ -68,38 +60,36 @@
             frames.push(frame);
         }
 
-        function updateFrameStatus() {
-            let status = 'Frame Status:\n';
-            frameStates.forEach((isVisible, i) => {
-                status += `Frame ${i + 1}: ${isVisible ? 'ON' : 'off'}\n`;
-            });
-            frameStatus.textContent = status;
+        function updateDebugDisplay() {
+            let text = 'Activated Frames:\n';
+            // Convert Set to array, sort numerically, and join with newlines
+            const sortedFrames = Array.from(activatedFrames).sort((a, b) => a - b);
+            text += sortedFrames.map(num => `Frame ${num + 1}`).join('\n');
+            debug.textContent = text;
         }
 
-        function showFrame(frameIndex) {
-            if (frameIndex >= 0 && frameIndex < 20 && !frameStates[frameIndex]) {
-                console.log(`Turning ON frame ${frameIndex + 1}`);
+        function activateFrame(frameIndex) {
+            if (frameIndex >= 0 && frameIndex < 20) {
+                console.log(`Activating frame ${frameIndex + 1}`);
                 frames[frameIndex].style.opacity = '1';
-                frameStates[frameIndex] = true;
-                updateFrameStatus();
+                activatedFrames.add(frameIndex);
+                updateDebugDisplay();
             }
         }
 
-        // Simple scroll handler
+        // Scroll handler
         window.addEventListener('scroll', () => {
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
             const frameToShow = Math.floor(scrollPercent * 20);
             
-            debug.textContent = `Scroll Progress: ${(scrollPercent * 100).toFixed(1)}%`;
-
-            // Show all frames up to current frame
+            // This is key - activate ALL frames up to current frame
             for (let i = 0; i <= frameToShow && i < 20; i++) {
-                showFrame(i);
+                activateFrame(i);
             }
         });
 
-        // Initial status display
-        updateFrameStatus();
+        // Show first frame initially
+        activateFrame(0);
     </script>
 </body>
 </html>
