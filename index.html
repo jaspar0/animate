@@ -83,7 +83,7 @@
     </style>
 </head>
 <body>
-    <div class="instruction">Scroll infinitely in either direction</div>
+    <div class="instruction">Scroll to reveal layers</div>
     <div class="scroll-progress">Frame: 1/20</div>
     <div class="animation-container">
         <div id="frames-container">
@@ -92,16 +92,16 @@
     </div>
 
     <script>
-        const totalFrames = 20;  // Adjust this to match your number of frames
-        const trailLength = 3;
+        const totalFrames = 20;
         const framesContainer = document.getElementById('frames-container');
         
         // Initialize scroll tracking
         let lastScrollY = window.scrollY;
         let accumulatedProgress = 0;
         let scrollTimeout = null;
+        let lastDirection = 0; // Track scroll direction: 1 for forward, -1 for backward
         
-        // Generate frames with updated file names
+        // Generate frames
         for (let i = 0; i < totalFrames; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
@@ -124,6 +124,9 @@
             const currentScrollY = window.scrollY;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
             
+            // Determine scroll direction
+            const currentDirection = currentScrollY > lastScrollY ? 1 : -1;
+            
             // Calculate scroll difference and update accumulated progress
             if (currentScrollY !== lastScrollY) {
                 const scrollDiff = (currentScrollY - lastScrollY) / maxScroll;
@@ -133,12 +136,10 @@
 
             // Reset scroll position when reaching extremes
             if (currentScrollY <= 100 || currentScrollY >= maxScroll - 100) {
-                // Clear any existing timeout
                 if (scrollTimeout) {
                     clearTimeout(scrollTimeout);
                 }
                 
-                // Set a timeout to reset the scroll position
                 scrollTimeout = setTimeout(() => {
                     window.scrollTo({
                         top: maxScroll / 2,
@@ -149,30 +150,18 @@
             }
             
             requestAnimationFrame(() => {
-                // Calculate current frame position with wrapping
+                // Calculate current frame with wrapping
                 const wrappedProgress = ((accumulatedProgress % totalFrames) + totalFrames) % totalFrames;
                 const currentFrame = Math.floor(wrappedProgress);
                 
-                // Update frame visibilities
+                // Update frame visibilities based on direction and position
                 frames.forEach((frame, index) => {
-                    let distance = index - wrappedProgress;
-                    
-                    // Adjust distance for wraparound
-                    if (distance > totalFrames / 2) distance -= totalFrames;
-                    if (distance < -totalFrames / 2) distance += totalFrames;
-                    
-                    if (Math.abs(distance) <= trailLength) {
-                        let opacity;
-                        if (distance === 0) {
-                            opacity = 1;
-                        } else if (distance > 0) {
-                            opacity = 1 - (distance / trailLength);
-                        } else {
-                            opacity = 1 - (Math.abs(distance) / trailLength);
-                        }
-                        frame.style.opacity = Math.max(0, opacity);
+                    if (currentDirection === 1) {
+                        // Forward scrolling: accumulate layers
+                        frame.style.opacity = index <= currentFrame ? 1 : 0;
                     } else {
-                        frame.style.opacity = 0;
+                        // Backward scrolling: remove layers
+                        frame.style.opacity = index <= currentFrame ? 1 : 0;
                     }
                 });
                 
@@ -182,6 +171,8 @@
                 
                 ticking = false;
             });
+            
+            lastDirection = currentDirection;
         }
         
         // Handle scroll events
