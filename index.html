@@ -6,6 +6,9 @@
             margin: 0;
             height: 500vh; /* Allows scrolling to trigger frame visibility */
             background: #eaeaea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
@@ -13,7 +16,6 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: transparent;
             width: auto;
             height: auto;
         }
@@ -22,11 +24,10 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 500px; /* Adjust to your image size */
-            height: 500px; /* Adjust to your image size */
+            width: 500px; /* Replace with your PNG dimensions */
+            height: 500px; /* Replace with your PNG dimensions */
             opacity: 0;
             transition: opacity 0.2s ease-in-out;
-            background: rgba(0, 0, 0, 0.1); /* Fallback background */
         }
 
         .frame img {
@@ -90,10 +91,7 @@
             frames.push(frame);
 
             img.onload = () => console.log(`Image ${i + 1} loaded`);
-            img.onerror = () => {
-                console.error(`Image ${i + 1} failed to load`);
-                frame.style.background = 'rgba(255, 0, 0, 0.2)'; // Red background for missing images
-            };
+            img.onerror = () => console.error(`Image ${i + 1} failed to load`);
         }
 
         function updateDebugDisplay() {
