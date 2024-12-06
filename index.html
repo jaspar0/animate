@@ -18,11 +18,45 @@
             justify-content: center;
         }
 
-        /* Center the container and scale responsively */
+        /* Main container for the image and state list */
+        .main-container {
+            display: flex;
+            width: 90vw;
+            height: 90vh;
+        }
+
+        /* Frame state list */
+        .state-list {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 15%; /* Fixed width for the state list */
+            height: 100%;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* State item */
+        .state-item {
+            font-family: Arial, sans-serif;
+            font-size: 1.2rem;
+            color: black;
+            opacity: 0.5; /* Default opacity for inactive states */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Highlighted active state */
+        .state-item.active {
+            opacity: 1; /* Full opacity for the active state */
+            transform: scale(1.2); /* Slightly larger size for emphasis */
+        }
+
+        /* PNG container */
         .container {
             position: relative;
-            width: 90vw; /* Scale with viewport width */
-            height: 90vh; /* Maintain proportional height */
+            flex: 1;
+            height: 100%;
             overflow: hidden;
         }
 
@@ -44,54 +78,26 @@
             height: 100%; /* Fill the container height */
             object-fit: contain; /* Maintain aspect ratio */
         }
-
-        .debug {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            z-index: 1000;
-            font-family: monospace;
-            border-radius: 4px;
-        }
-
-        .reset-button {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            background: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 1000;
-        }
     </style>
 </head>
 <body>
-    <div class="debug">Scroll to activate or deactivate frames with bounce-back logic.</div>
-    <button class="reset-button">Reset Animation</button>
-    <div class="container"></div>
+    <div class="main-container">
+        <div class="state-list"></div>
+        <div class="container"></div>
+    </div>
 
     <script>
         const container = document.querySelector('.container');
-        const debug = document.querySelector('.debug');
-        const resetButton = document.querySelector('.reset-button');
+        const stateList = document.querySelector('.state-list');
         const frames = [];
-
+        const stateItems = [];
         const scrollThreshold = 100; // Sensitivity for scroll progression
-        const momentumThreshold = 300; // Time in ms to detect a break in scrolling
         let scrollDelta = 0; // Accumulated scroll value
-        let lastScrollTime = Date.now(); // Timestamp of the last scroll event
-        let isMomentumAllowed = false; // Whether momentum scrolling is currently active
+        let currentFrameIndex = -1; // Track the current frame index; -1 means no frames visible
 
-        // Create 20 frames
+        // Create 20 frames and corresponding state items
         for (let i = 0; i < 20; i++) {
+            // Create frame elements
             const frame = document.createElement('div');
             frame.className = 'frame';
             frame.style.zIndex = 20 - i; // Proper stacking order
@@ -104,96 +110,61 @@
             container.appendChild(frame);
             frames.push(frame);
 
-            img.onload = () => console.log(`Image ${i + 1} loaded`);
-            img.onerror = () => console.error(`Image ${i + 1} failed to load`);
+            // Create corresponding state item
+            const stateItem = document.createElement('div');
+            stateItem.className = 'state-item';
+            stateItem.textContent = `Frame ${i + 1}`;
+            stateList.appendChild(stateItem);
+            stateItems.push(stateItem);
         }
 
-        function updateDebugDisplay() {
-            let debugContent = 'Real-time Frame States:\n';
+        // Update UI to reflect the active frame
+        function updateActiveFrame(frameIndex) {
+            // Update frames
             frames.forEach((frame, index) => {
-                const opacity = frame.style.opacity || '0';
-                debugContent += `Frame ${index + 1}: ${opacity === '1' ? 'VISIBLE' : 'hidden'}\n`;
+                frame.style.opacity = index === frameIndex ? '1' : '0';
             });
-            debug.textContent = debugContent;
-        }
 
-        function activateFramesUpTo(frameIndex) {
-            frames.forEach((frame, index) => {
-                if (index <= frameIndex) {
-                    frame.style.opacity = '1'; // Make visible
+            // Update state list
+            stateItems.forEach((item, index) => {
+                if (index === frameIndex) {
+                    item.classList.add('active');
                 } else {
-                    frame.style.opacity = '0'; // Hide frames beyond the active index
+                    item.classList.remove('active');
                 }
             });
-            updateDebugDisplay();
-        }
 
-        function resetAnimation() {
-            currentFrameIndex = -1; // Reset to no frames visible
-            frames.forEach(frame => {
-                frame.style.opacity = '0'; // Reset visibility
-            });
-            isMomentumAllowed = false; // Reset momentum
-            updateDebugDisplay();
-        }
-
-        let currentFrameIndex = -1; // Track the current frame index; -1 means no frames visible
-
-        // Handle scrolling with bounce-back logic
-        window.addEventListener('wheel', (event) => {
-            const now = Date.now();
-            const timeSinceLastScroll = now - lastScrollTime;
-
-            // Reset momentum if there's a pause
-            if (timeSinceLastScroll > momentumThreshold) {
-                isMomentumAllowed = false;
+            // Center the active state in the list
+            const activeItem = stateItems[frameIndex];
+            if (activeItem) {
+                const listHeight = stateList.offsetHeight;
+                const itemOffset = activeItem.offsetTop - listHeight / 2 + activeItem.offsetHeight / 2;
+                stateList.scrollTop = itemOffset;
             }
+        }
 
+        // Handle scroll events
+        window.addEventListener('wheel', (event) => {
             scrollDelta += event.deltaY; // Accumulate scroll values
 
             if (Math.abs(scrollDelta) >= scrollThreshold) {
                 const direction = scrollDelta > 0 ? 1 : -1; // Determine direction
+                const newFrameIndex = Math.min(
+                    Math.max(currentFrameIndex + direction, 0),
+                    frames.length - 1
+                ); // Clamp between 0 and the last frame index
 
-                let newFrameIndex = currentFrameIndex + direction;
-
-                // Bounce-back logic at boundaries
-                if (newFrameIndex > frames.length - 1) {
-                    if (isMomentumAllowed) {
-                        // Allow continuation to frame 0 (loop-like behavior)
-                        newFrameIndex = 0;
-                    } else {
-                        // Bounce back to frame 19
-                        newFrameIndex = frames.length - 2;
-                    }
-                } else if (newFrameIndex < -1) {
-                    if (isMomentumAllowed) {
-                        // Allow continuation to frame 20
-                        newFrameIndex = frames.length - 1;
-                    } else {
-                        // Bounce back to frame 0
-                        newFrameIndex = 0;
-                    }
+                if (newFrameIndex !== currentFrameIndex) {
+                    currentFrameIndex = newFrameIndex;
+                    updateActiveFrame(currentFrameIndex);
                 }
-
-                // Update frame index and visibility
-                currentFrameIndex = newFrameIndex;
-                activateFramesUpTo(currentFrameIndex);
-
-                // Enable momentum scrolling if no break
-                isMomentumAllowed = true;
 
                 scrollDelta = 0; // Reset scroll delta
             }
-
-            lastScrollTime = now; // Update last scroll time
-        });
-
-        resetButton.addEventListener('click', () => {
-            resetAnimation();
         });
 
         // Initialize
-        resetAnimation();
+        updateActiveFrame(0); // Start with the first frame visible
     </script>
 </body>
 </html>
