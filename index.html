@@ -143,21 +143,24 @@
             }
         }
 
-        // Handle scroll events
+        // Handle infinite scroll logic
         window.addEventListener('wheel', (event) => {
             scrollDelta += event.deltaY; // Accumulate scroll values
 
             if (Math.abs(scrollDelta) >= scrollThreshold) {
                 const direction = scrollDelta > 0 ? 1 : -1; // Determine direction
-                const newFrameIndex = Math.min(
-                    Math.max(currentFrameIndex + direction, 0),
-                    frames.length - 1
-                ); // Clamp between 0 and the last frame index
+                let newFrameIndex = currentFrameIndex + direction;
 
-                if (newFrameIndex !== currentFrameIndex) {
-                    currentFrameIndex = newFrameIndex;
-                    updateActiveFrame(currentFrameIndex);
+                // Infinite scrolling logic
+                if (newFrameIndex > frames.length - 1) {
+                    newFrameIndex = 0; // Wrap forward to frame 0
+                } else if (newFrameIndex < 0) {
+                    newFrameIndex = frames.length - 1; // Wrap backward to frame 20
                 }
+
+                // Update the frame index and UI
+                currentFrameIndex = newFrameIndex;
+                updateActiveFrame(currentFrameIndex);
 
                 scrollDelta = 0; // Reset scroll delta
             }
