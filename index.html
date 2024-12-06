@@ -10,19 +10,30 @@
 
         .container {
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 100vw;
             height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .frame {
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: absolute;
             width: 100%;
             height: 100%;
             opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .frame img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
         .debug {
@@ -30,66 +41,76 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             padding: 10px;
             z-index: 1000;
             font-family: monospace;
-            white-space: pre-line;  /* Allow line breaks in text */
-            max-height: 80vh;       /* Limit height */
-            overflow-y: auto;       /* Scrollable if too long */
-            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .frame-status {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            z-index: 1000;
+            font-family: monospace;
+            border-radius: 4px;
+            max-width: 80vw;
         }
     </style>
 </head>
 <body>
-    <div class="debug">Activated Frames:</div>
+    <div class="debug">Scroll Progress: 0%</div>
+    <div class="frame-status">Frames Active: None</div>
     <div class="container"></div>
 
     <script>
         const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
-        const activatedFrames = new Set();  // Keep track of activated frames
+        const frameStatus = document.querySelector('.frame-status');
         const frames = [];
+        const activeFrames = new Set();
 
         // Create frames
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
             frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
+            // Store the frame's index for debugging
+            frame.dataset.frameIndex = i;
             container.appendChild(frame);
             frames.push(frame);
         }
 
-        function updateDebugDisplay() {
-            let text = 'Activated Frames:\n';
-            // Convert Set to array, sort numerically, and join with newlines
-            const sortedFrames = Array.from(activatedFrames).sort((a, b) => a - b);
-            text += sortedFrames.map(num => `Frame ${num + 1}`).join('\n');
-            debug.textContent = text;
+        function updateDisplay() {
+            const activeList = Array.from(activeFrames).map(i => i + 1).join(', ');
+            frameStatus.textContent = `Frames Active: ${activeList || 'None'}`;
         }
 
-        function activateFrame(frameIndex) {
-            if (frameIndex >= 0 && frameIndex < 20) {
-                console.log(`Activating frame ${frameIndex + 1}`);
-                frames[frameIndex].style.opacity = '1';
-                activatedFrames.add(frameIndex);
-                updateDebugDisplay();
+        function activateFramesUpTo(frameIndex) {
+            for (let i = 0; i <= frameIndex; i++) {
+                if (!activeFrames.has(i)) {
+                    console.log(`Activating frame ${i + 1}`);
+                    frames[i].style.opacity = '1';
+                    activeFrames.add(i);
+                }
             }
+            updateDisplay();
         }
 
-        // Scroll handler
         window.addEventListener('scroll', () => {
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            const frameToShow = Math.floor(scrollPercent * 20);
+            const frameToShow = Math.min(Math.floor(scrollPercent * 20), 19);
             
-            // This is key - activate ALL frames up to current frame
-            for (let i = 0; i <= frameToShow && i < 20; i++) {
-                activateFrame(i);
-            }
+            debug.textContent = `Scroll Progress: ${(scrollPercent * 100).toFixed(1)}%`;
+            activateFramesUpTo(frameToShow);
         });
 
         // Show first frame initially
-        activateFrame(0);
+        activateFramesUpTo(0);
     </script>
 </body>
 </html>
