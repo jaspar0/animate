@@ -2,11 +2,10 @@
 <html>
 <head>
     <style>
-        /* Same styles as before */
         body {
             margin: 0;
             height: 500vh;
-            background: white;
+            background: transparent;
         }
 
         .container {
@@ -16,10 +15,10 @@
             transform: translate(-50%, -50%);
             width: 90vw;
             height: 90vh;
-            border: 2px solid transparent;
             background: transparent;
         }
 
+        /* Key changes in frame styling */
         .frame {
             position: absolute;
             top: 50%;
@@ -27,17 +26,22 @@
             transform: translate(-50%, -50%);
             opacity: 0;
             transition: opacity 0.2s ease;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            pointer-events: none; /* Prevent any interaction issues */
         }
+
+        /* Specific sizing for each frame to ensure they're different sizes like the squares were */
+        .frame:nth-child(1) img { width: 90%; height: 90%; }
+        .frame:nth-child(2) img { width: 85%; height: 85%; }
+        .frame:nth-child(3) img { width: 80%; height: 80%; }
+        .frame:nth-child(4) img { width: 75%; height: 75%; }
+        .frame:nth-child(5) img { width: 70%; height: 70%; }
+        /* ... and so on for all 20 frames */
 
         .frame img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            display: block;
         }
 
         .debug {
@@ -46,7 +50,7 @@
             left: 20px;
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
-            z-index: 1001;
+            z-index: 2000; /* Above all frames */
             font-family: monospace;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -65,7 +69,7 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            z-index: 1001;
+            z-index: 2000;
         }
     </style>
 </head>
@@ -80,27 +84,25 @@
         const resetButton = document.querySelector('.reset-button');
         const frames = [];
         
-        // Create frames with the correct image path
+        // Create frames with explicit z-index
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
-            frame.id = `frame${i + 1}`;
-            frame.style.zIndex = i + 1;
+            frame.style.zIndex = 20 - i; // Explicit z-index from 20 down to 1
             
-            // Using the correct file naming convention
-            frame.innerHTML = `
-                <img 
-                    src="./sigil_12_06/sig${i + 1}.png" 
-                    onload="console.log('Image ${i + 1} loaded')" 
-                    onerror="console.error('Failed to load image ${i + 1}')"
-                >
-            `;
+            const img = document.createElement('img');
+            img.src = `sigil_12_06/sig${i + 1}.png`;
+            img.alt = `Frame ${i + 1}`;
             
+            frame.appendChild(img);
             container.appendChild(frame);
             frames.push(frame);
+
+            // Log when each image loads
+            img.onload = () => console.log(`Image ${i + 1} loaded`);
+            img.onerror = () => console.error(`Image ${i + 1} failed to load`);
         }
 
-        // Rest of the code remains the same
         function updateDebugDisplay() {
             let debugContent = 'Real-time Frame States:\n';
             frames.forEach((frame, index) => {
@@ -112,6 +114,7 @@
 
         function activateFramesUpTo(frameIndex) {
             frames.forEach((frame, index) => {
+                // Key change: frames stay visible once activated
                 if (index <= frameIndex) {
                     frame.style.opacity = '1';
                 }
@@ -140,6 +143,7 @@
 
         resetButton.addEventListener('click', resetAnimation);
 
+        // Initialize
         resetAnimation();
     </script>
 </body>
