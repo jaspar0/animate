@@ -5,7 +5,7 @@
         body {
             margin: 0;
             height: 500vh;
-            background: transparent;
+            background: white;
         }
 
         .container {
@@ -13,35 +13,52 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90vw;
+            width: 90vw; /* Make container bigger */
             height: 90vh;
-            background: transparent;
+            border: 2px solid black;
+            background: white;
         }
 
-        /* Key changes in frame styling */
+        /* Remove transform from .frame class */
         .frame {
             position: absolute;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            /* Center each frame */
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            pointer-events: none; /* Prevent any interaction issues */
+            /* Add border to clearly see boundaries */
+            border: 3px solid black;
         }
 
-        /* Specific sizing for each frame to ensure they're different sizes like the squares were */
-        .frame:nth-child(1) img { width: 90%; height: 90%; }
-        .frame:nth-child(2) img { width: 85%; height: 85%; }
-        .frame:nth-child(3) img { width: 80%; height: 80%; }
-        .frame:nth-child(4) img { width: 75%; height: 75%; }
-        .frame:nth-child(5) img { width: 70%; height: 70%; }
-        /* ... and so on for all 20 frames */
+        /* Very distinct sizes */
+        #frame1 {
+            width: 80vh;  /* Much bigger */
+            height: 80vh;
+            background-color: rgba(255, 0, 0, 0.5);
+            z-index: 1;
+        }
 
-        .frame img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: block;
+        #frame2 {
+            width: 60vh;  /* Big */
+            height: 60vh;
+            background-color: rgba(0, 255, 0, 0.5);
+            z-index: 2;
+        }
+
+        #frame3 {
+            width: 40vh;  /* Medium */
+            height: 40vh;
+            background-color: rgba(0, 0, 255, 0.5);
+            z-index: 3;
+        }
+
+        #frame4 {
+            width: 20vh;  /* Small */
+            height: 20vh;
+            background-color: rgba(255, 255, 0, 0.5);
+            z-index: 4;
         }
 
         .debug {
@@ -50,7 +67,7 @@
             left: 20px;
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
-            z-index: 2000; /* Above all frames */
+            z-index: 1001;
             font-family: monospace;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -69,55 +86,39 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            z-index: 2000;
+            z-index: 1001;
         }
     </style>
 </head>
 <body>
     <div class="debug">Real-time Frame States:</div>
     <button class="reset-button">Reset Animation</button>
-    <div class="container"></div>
+    <div class="container">
+        <div id="frame1" class="frame"></div>
+        <div id="frame2" class="frame"></div>
+        <div id="frame3" class="frame"></div>
+        <div id="frame4" class="frame"></div>
+    </div>
 
     <script>
-        const container = document.querySelector('.container');
+        const frames = document.querySelectorAll('.frame');
         const debug = document.querySelector('.debug');
         const resetButton = document.querySelector('.reset-button');
-        const frames = [];
-        
-        // Create frames with explicit z-index
-        for (let i = 0; i < 20; i++) {
-            const frame = document.createElement('div');
-            frame.className = 'frame';
-            frame.style.zIndex = 20 - i; // Explicit z-index from 20 down to 1
-            
-            const img = document.createElement('img');
-            img.src = `sigil_12_06/sig${i + 1}.png`;
-            img.alt = `Frame ${i + 1}`;
-            
-            frame.appendChild(img);
-            container.appendChild(frame);
-            frames.push(frame);
-
-            // Log when each image loads
-            img.onload = () => console.log(`Image ${i + 1} loaded`);
-            img.onerror = () => console.error(`Image ${i + 1} failed to load`);
-        }
 
         function updateDebugDisplay() {
             let debugContent = 'Real-time Frame States:\n';
             frames.forEach((frame, index) => {
                 const opacity = frame.style.opacity || '0';
+                const size = frame.getBoundingClientRect();
                 debugContent += `Frame ${index + 1}: ${opacity === '1' ? 'VISIBLE' : 'hidden'} (opacity: ${opacity})\n`;
+                debugContent += `   Size: ${Math.round(size.width)}x${Math.round(size.height)}px\n`;
             });
             debug.textContent = debugContent;
         }
 
         function activateFramesUpTo(frameIndex) {
             frames.forEach((frame, index) => {
-                // Key change: frames stay visible once activated
-                if (index <= frameIndex) {
-                    frame.style.opacity = '1';
-                }
+                frame.style.opacity = index <= frameIndex ? '1' : '0';
             });
             updateDebugDisplay();
         }
@@ -137,7 +138,7 @@
 
         window.addEventListener('scroll', () => {
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            const frameToShow = Math.min(Math.floor(scrollPercent * 20), 19);
+            const frameToShow = Math.min(Math.floor(scrollPercent * 4), 3);
             activateFramesUpTo(frameToShow);
         });
 
