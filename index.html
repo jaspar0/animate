@@ -14,21 +14,19 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: transparent;
+            pointer-events: none;
         }
 
         .frame {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            /* Start completely invisible */
             opacity: 0;
+            /* Smooth transition when becoming visible */
             transition: opacity 0.3s ease;
-        }
-
-        .frame.visible {
-            opacity: 1;
         }
 
         .frame img {
@@ -46,54 +44,44 @@
             padding: 10px;
             font-family: monospace;
             z-index: 1000;
-            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <div class="debug">Lights On: 0/20</div>
+    <div class="debug">Frame: 0/20</div>
     <div class="container"></div>
 
     <script>
         const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
+        let highestFrameShown = 0;
         
-        // Keep track of which frames are visible
-        const visibleFrames = new Set();
-        
-        // Create all frames
-        const frames = Array.from({ length: 20 }, (_, i) => {
+        // Create all 20 frames
+        for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
             frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
             container.appendChild(frame);
-            return frame;
-        });
+        }
 
-        // Simple scroll handler that only turns lights on
+        // Get all frames
+        const frames = document.querySelectorAll('.frame');
+
+        // On scroll, just make frames visible
         window.addEventListener('scroll', () => {
-            const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            const frameToShow = Math.min(Math.floor(scrollPercent * 20), 19);
-
-            // If this frame isn't visible yet, make it visible
-            if (!visibleFrames.has(frameToShow)) {
-                frames[frameToShow].classList.add('visible');
-                visibleFrames.add(frameToShow);
-                debug.textContent = `Lights On: ${visibleFrames.size}/20`;
-            }
-        });
-
-        // Log when frames become visible (for debugging)
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.target.classList.contains('visible')) {
-                    console.log(`Frame ${frames.indexOf(mutation.target)} is now visible`);
+            // Calculate what frame we should be at
+            const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            const currentFrame = Math.min(Math.floor(scrollProgress * 20), 20);
+            
+            // If we've reached a new highest frame, show it
+            if (currentFrame > highestFrameShown) {
+                // Show all frames up to current
+                for (let i = 0; i <= currentFrame; i++) {
+                    frames[i].style.opacity = '1';
                 }
-            });
-        });
-
-        frames.forEach(frame => {
-            observer.observe(frame, { attributes: true });
+                highestFrameShown = currentFrame;
+                debug.textContent = `Frames visible: 1-${currentFrame + 1}`;
+            }
         });
     </script>
 </body>
