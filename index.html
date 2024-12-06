@@ -21,44 +21,16 @@
         /* Main container for the image and state list */
         .main-container {
             display: flex;
-            width: 90vw;
-            height: 90vh;
-        }
-
-        /* Frame state list */
-        .state-list {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start; /* Left-align the text */
-            width: 15%; /* Default width for the state list */
+            flex-direction: column; /* Stack vertically on mobile */
+            width: 100%;
             height: 100%;
-            overflow: hidden;
-            text-align: left;
-            font-family: 'IBM Plex Mono', monospace; /* Use IBM Plex Mono or fallback to monospace */
-            font-size: 1rem;
-            padding-left: 10px; /* Add padding to prevent cut-off text */
         }
 
-        /* State item */
-        .state-item {
-            color: black;
-            opacity: 0.5; /* Default opacity for inactive states */
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            cursor: pointer; /* Make items clickable */
-        }
-
-        /* Highlighted active state */
-        .state-item.active {
-            opacity: 1; /* Full opacity for the active state */
-            transform: scale(1.1); /* Slightly larger size for emphasis */
-        }
-
-        /* PNG container */
+        /* Animation container */
         .container {
             position: relative;
             flex: 1;
-            height: 100%;
+            width: 100%;
             overflow: hidden;
         }
 
@@ -76,38 +48,70 @@
 
         .frame img {
             display: block;
-            width: 100%; /* Fill the container width */
-            height: 100%; /* Fill the container height */
+            width: 100%;
+            height: 100%;
             object-fit: contain; /* Maintain aspect ratio */
         }
 
+        /* Horizontal state list */
+        .state-list {
+            display: flex;
+            flex-direction: row; /* Horizontal layout */
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: auto; /* Allow horizontal scrolling */
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9); /* Slight background for readability */
+            white-space: nowrap; /* Prevent line wrapping */
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+        }
+
+        /* State item */
+        .state-item {
+            display: inline-block; /* Inline for horizontal scrolling */
+            margin: 0 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            color: black;
+            opacity: 0.5; /* Default opacity for inactive states */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Highlighted active state */
+        .state-item.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
         /* Responsive adjustments */
-        @media (max-width: 1200px) {
-            .state-list {
-                width: 12%; /* Shrink the state list width */
-                font-size: 0.9rem; /* Smaller font size */
+        @media (min-width: 900px) {
+            .main-container {
+                flex-direction: row; /* Restore desktop layout */
             }
-        }
 
-        @media (max-width: 900px) {
             .state-list {
-                width: 10%; /* Further shrink state list width */
-                font-size: 0.8rem; /* Smaller font size */
+                flex-direction: column; /* Vertical list on desktop */
+                overflow-x: hidden;
+                overflow-y: auto; /* Vertical scrolling */
+                width: 15%;
+                padding: 0 10px;
+                box-shadow: none;
             }
-        }
 
-        @media (max-width: 600px) {
-            .state-list {
-                width: 8%; /* Minimized state list width */
-                font-size: 0.7rem; /* Further reduce font size */
+            .state-item {
+                display: block;
+                margin: 5px 0;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <div class="state-list"></div>
         <div class="container"></div>
+        <div class="state-list"></div>
     </div>
 
     <script>
@@ -115,143 +119,77 @@
         const stateList = document.querySelector('.state-list');
         const frames = [];
         const stateItems = [];
-        const scrollThreshold = 100; // Sensitivity for scroll progression
-        let scrollDelta = 0; // Accumulated scroll value
-        let currentFrameIndex = 0; // Start at Frame 0
+        let currentFrameIndex = 0;
 
         // Define custom names for the frames (including Frame 0)
         const frameNames = [
-            "00_KHAOS",  // Frame 00
-            "01_VOID",  
+            "00_KHAOS",
+            "01_VOID",
             "02_AETHER",
             "03_FLARE",
             "04_FUSION",
             "05_TERRA",
-            "06_AQUA", 
-            "07_PLASMA_LUX",  
-            "08_GAIA",  
-            "09_ANIMA",  
-            "10_ARCHE",  
-            "11_MATERIA",  
-            "12_PRESENCE",  
-            "13_KHAOS_REBORN",  
-            "14_DARK_MATTER",  
-            "15_ANTIMATTER",  
-            "16_SYNTHESIS",  
-            "17_GENIUS_LOCI",  
-            "18_CHRONOS",  
-            "19_ETHOS",  
-            "20_UNIVERSE",  
-            "21_HARMONY"  
+            "06_AQUA",
+            "07_PLASMA_LUX",
+            "08_GAIA",
+            "09_ANIMA",
+            "10_ARCHE",
+            "11_MATERIA",
+            "12_PRESENCE",
+            "13_KHAOS_REBORN",
+            "14_DARK_MATTER",
+            "15_ANTIMATTER",
+            "16_SYNTHESIS",
+            "17_GENIUS_LOCI",
+            "18_CHRONOS",
+            "19_ETHOS",
+            "20_UNIVERSE",
+            "21_HARMONY"
         ];
 
-        // Create Frame 0 (no visible image)
-        const frame0 = document.createElement('div');
-        frame0.className = 'frame';
-        container.appendChild(frame0);
-        frames.push(frame0);
-
-        // Create remaining frames and corresponding state items
-        for (let i = 1; i < frameNames.length; i++) {
+        // Create frames and state items
+        frameNames.forEach((name, index) => {
+            // Create frame
             const frame = document.createElement('div');
             frame.className = 'frame';
-            frame.style.zIndex = 20 - i;
+            frame.style.zIndex = frameNames.length - index;
 
-            const img = document.createElement('img');
-            img.src = `sigil_12_06/sig${i}.png`; // Ensure this path is correct
-            img.alt = frameNames[i];
+            if (index > 0) {
+                const img = document.createElement('img');
+                img.src = `sigil_12_06/sig${index}.png`;
+                img.alt = name;
+                frame.appendChild(img);
+            }
 
-            // Check if the image exists to avoid errors
-            img.onerror = () => {
-                console.error(`Image not found: sigil_12_06/sig${i}.png`);
-                frame.style.display = 'none'; // Hide frame if image is missing
-            };
-
-            frame.appendChild(img);
             container.appendChild(frame);
             frames.push(frame);
 
-            // Create corresponding state item
+            // Create state item
             const stateItem = document.createElement('div');
             stateItem.className = 'state-item';
-            stateItem.textContent = frameNames[i];
+            stateItem.textContent = name;
             stateList.appendChild(stateItem);
             stateItems.push(stateItem);
 
-            // Add click event to jump directly to this state
+            // Click handler
             stateItem.addEventListener('click', () => {
-                currentFrameIndex = i;
-                updateActiveFrame(i);
+                currentFrameIndex = index;
+                updateActiveFrame(index);
+            });
+        });
+
+        // Update active frame
+        function updateActiveFrame(index) {
+            frames.forEach((frame, i) => {
+                frame.style.opacity = i <= index ? '1' : '0';
+            });
+
+            stateItems.forEach((item, i) => {
+                item.classList.toggle('active', i === index);
             });
         }
 
-        // Add Frame 0 state item to the list
-        const frame0StateItem = document.createElement('div');
-        frame0StateItem.className = 'state-item';
-        frame0StateItem.textContent = frameNames[0];
-        stateList.prepend(frame0StateItem);
-        stateItems.unshift(frame0StateItem);
-
-        // Add click event to Frame 0
-        frame0StateItem.addEventListener('click', () => {
-            currentFrameIndex = 0;
-            updateActiveFrame(0);
-        });
-
-        // Update UI to reflect the active frame
-        function updateActiveFrame(frameIndex) {
-            // Update frames (cumulative visibility, except for Frame 0)
-            frames.forEach((frame, index) => {
-                if (frameIndex === 0) {
-                    frame.style.opacity = '0'; // Frame 0 hides everything
-                } else {
-                    frame.style.opacity = index <= frameIndex ? '1' : '0';
-                }
-            });
-
-            // Update state list
-            stateItems.forEach((item, index) => {
-                if (index === frameIndex) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-
-            // Center the active state in the list
-            const activeItem = stateItems[frameIndex];
-            if (activeItem) {
-                const listHeight = stateList.offsetHeight;
-                const itemOffset = activeItem.offsetTop - listHeight / 2 + activeItem.offsetHeight / 2;
-                stateList.scrollTop = itemOffset;
-            }
-        }
-
-        // Handle infinite scroll logic
-        window.addEventListener('wheel', (event) => {
-            scrollDelta += event.deltaY; // Accumulate scroll values
-
-            if (Math.abs(scrollDelta) >= scrollThreshold) {
-                const direction = scrollDelta > 0 ? 1 : -1; // Determine direction
-                let newFrameIndex = currentFrameIndex + direction;
-
-                // Infinite scrolling logic
-                if (newFrameIndex > frames.length - 1) {
-                    newFrameIndex = 0; // Wrap forward to Frame 0
-                } else if (newFrameIndex < 0) {
-                    newFrameIndex = frames.length - 1; // Wrap backward to Frame 20
-                }
-
-                // Update the frame index and UI
-                currentFrameIndex = newFrameIndex;
-                updateActiveFrame(currentFrameIndex);
-
-                scrollDelta = 0; // Reset scroll delta
-            }
-        });
-
-        // Initialize
-        updateActiveFrame(0); // Start with Frame 0 (No Frame Active)
+        updateActiveFrame(0); // Initialize
     </script>
 </body>
 </html>
