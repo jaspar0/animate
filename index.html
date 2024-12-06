@@ -5,7 +5,7 @@
         body {
             margin: 0;
             height: 500vh;
-            background: white;  /* White background to clearly see test squares */
+            background: white;
         }
 
         .container {
@@ -13,27 +13,49 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 500px;  /* Fixed container size */
+            width: 500px;
             height: 500px;
-            border: 2px solid black;  /* Border to see container bounds */
+            border: 2px solid black;
             background: white;
         }
 
         .frame {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             opacity: 0;
             transition: opacity 0.2s ease;
         }
 
-        /* Distinct colors for each frame */
-        #frame1 { background-color: rgba(255, 0, 0, 0.5); }    /* Red */
-        #frame2 { background-color: rgba(0, 255, 0, 0.5); }    /* Green */
-        #frame3 { background-color: rgba(0, 0, 255, 0.5); }    /* Blue */
-        #frame4 { background-color: rgba(255, 255, 0, 0.5); }  /* Yellow */
+        /* Different sizes and colors for each frame */
+        #frame1 {
+            width: 400px;
+            height: 400px;
+            background-color: rgba(255, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        #frame2 {
+            width: 300px;
+            height: 300px;
+            background-color: rgba(0, 255, 0, 0.5);
+            z-index: 2;
+        }
+
+        #frame3 {
+            width: 200px;
+            height: 200px;
+            background-color: rgba(0, 0, 255, 0.5);
+            z-index: 3;
+        }
+
+        #frame4 {
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 255, 0, 0.5);
+            z-index: 4;
+        }
 
         .debug {
             position: fixed;
@@ -68,7 +90,6 @@
     <div class="debug">Real-time Frame States:</div>
     <button class="reset-button">Reset Animation</button>
     <div class="container">
-        <!-- Only colored divs, no images -->
         <div id="frame1" class="frame"></div>
         <div id="frame2" class="frame"></div>
         <div id="frame3" class="frame"></div>
