@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinite Scroll Animation</title>
+    <title>Layer Accumulation Animation</title>
     <style>
         html, body {
             margin: 0;
@@ -95,11 +95,12 @@
         const totalFrames = 20;
         const framesContainer = document.getElementById('frames-container');
         
-        // Initialize scroll tracking
+        // Initialize tracking variables
         let lastScrollY = window.scrollY;
         let accumulatedProgress = 0;
         let scrollTimeout = null;
-        let frameStates = new Array(totalFrames).fill(false); // Track visibility of each frame
+        let reachedEnd = false; // Track if we've reached frame 20
+        let goingBackward = false; // Track if we're in backward phase
         
         // Generate frames
         for (let i = 0; i < totalFrames; i++) {
@@ -124,9 +125,6 @@
             const currentScrollY = window.scrollY;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
             
-            // Calculate scroll direction
-            const scrollDirection = currentScrollY > lastScrollY ? 1 : -1;
-            
             // Calculate scroll difference and update accumulated progress
             if (currentScrollY !== lastScrollY) {
                 const scrollDiff = (currentScrollY - lastScrollY) / maxScroll;
@@ -150,30 +148,35 @@
             }
             
             requestAnimationFrame(() => {
-                // Calculate current frame with wrapping
-                const wrappedProgress = ((accumulatedProgress % totalFrames) + totalFrames) % totalFrames;
-                const currentFrame = Math.floor(wrappedProgress);
+                // Calculate current frame
+                let wrappedProgress = ((accumulatedProgress % totalFrames) + totalFrames) % totalFrames;
+                let currentFrame = Math.floor(wrappedProgress);
                 
-                // Update frame states based on scroll direction
-                if (scrollDirection > 0) {
-                    // Forward scrolling: reveal frames up to current
-                    for (let i = 0; i <= currentFrame; i++) {
-                        frameStates[i] = true;
-                    }
-                } else {
-                    // Backward scrolling: hide frames after current
-                    for (let i = currentFrame + 1; i < totalFrames; i++) {
-                        frameStates[i] = false;
-                    }
+                // Check if we've reached frame 20
+                if (currentFrame === totalFrames - 1 && !reachedEnd) {
+                    reachedEnd = true;
+                    goingBackward = true;
                 }
                 
-                // Apply visibility based on frame states
+                // Check if we're back to frame 1
+                if (currentFrame === 0 && reachedEnd) {
+                    reachedEnd = false;
+                    goingBackward = false;
+                }
+                
+                // Update frame visibilities
                 frames.forEach((frame, index) => {
-                    frame.style.opacity = frameStates[index] ? 1 : 0;
+                    if (!goingBackward) {
+                        // Forward phase: accumulate layers
+                        frame.style.opacity = index <= currentFrame ? 1 : 0;
+                    } else {
+                        // Backward phase: remove layers from the end
+                        frame.style.opacity = index <= currentFrame ? 1 : 0;
+                    }
                 });
                 
                 // Update progress display
-                const displayFrame = ((currentFrame % totalFrames) + totalFrames) % totalFrames + 1;
+                const displayFrame = currentFrame + 1;
                 progressElement.textContent = `Frame: ${displayFrame}/${totalFrames}`;
                 
                 ticking = false;
@@ -193,7 +196,7 @@
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
             window.scrollTo(0, maxScroll / 2);
             lastScrollY = maxScroll / 2;
-            frameStates[0] = true; // Make first frame visible initially
+            frames[0].style.opacity = 1; // Make first frame visible
             updateAnimation();
         });
     </script>
