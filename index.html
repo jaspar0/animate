@@ -74,7 +74,7 @@
     </style>
 </head>
 <body>
-    <div class="debug">Scroll to activate or deactivate frames with momentum.</div>
+    <div class="debug">Scroll to activate or deactivate frames with bounce-back logic.</div>
     <button class="reset-button">Reset Animation</button>
     <div class="container"></div>
 
@@ -139,7 +139,7 @@
 
         let currentFrameIndex = -1; // Track the current frame index; -1 means no frames visible
 
-        // Handle scrolling with bouncing and momentum
+        // Handle scrolling with bounce-back logic
         window.addEventListener('wheel', (event) => {
             const now = Date.now();
             const timeSinceLastScroll = now - lastScrollTime;
@@ -156,10 +156,10 @@
 
                 let newFrameIndex = currentFrameIndex + direction;
 
-                // Check for boundary conditions
+                // Bounce-back logic at boundaries
                 if (newFrameIndex > frames.length - 1) {
                     if (isMomentumAllowed) {
-                        // Allow continuation to frame 0
+                        // Allow continuation to frame 0 (loop-like behavior)
                         newFrameIndex = 0;
                     } else {
                         // Bounce back to frame 19
