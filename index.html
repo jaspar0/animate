@@ -10,7 +10,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* No infinite scrolling */
+            overflow: hidden; /* Prevent overscrolling */
         }
 
         body {
@@ -26,9 +26,6 @@
             height: 80vh;
             background: white;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border: 2px solid #ccc;
         }
 
@@ -72,7 +69,7 @@
         const totalFrames = 20;
         const framesContainer = document.getElementById('frames-container');
         const progressElement = document.querySelector('.scroll-progress');
-        let currentFrame = 0;
+        let currentFrame = 0; // Start at frame 1
 
         // Generate frames
         for (let i = 1; i <= totalFrames; i++) {
@@ -87,9 +84,7 @@
         // Ensure only the first frame is initially visible
         frames[0].style.opacity = 1;
 
-        // Track scroll progress
-        let isScrolling = false;
-
+        // Update frames based on direction
         const updateFrames = (direction) => {
             if (direction === 'forward' && currentFrame < totalFrames - 1) {
                 currentFrame++;
@@ -101,23 +96,25 @@
             progressElement.textContent = `Frame: ${currentFrame + 1}/${totalFrames}`;
         };
 
-        // Listen for scroll events
+        // Handle scroll events
+        let isScrolling = false; // Prevent rapid-fire scrolling
+
         window.addEventListener('wheel', (event) => {
-            if (isScrolling) return; // Prevent rapid-fire scrolling
+            if (isScrolling) return; // Block rapid scroll actions
             isScrolling = true;
 
             if (event.deltaY > 0) {
-                // Scrolling down
+                // Scrolling forward
                 updateFrames('forward');
             } else if (event.deltaY < 0) {
-                // Scrolling up
+                // Scrolling backward
                 updateFrames('backward');
             }
 
-            // Allow scrolling again after a short delay
+            // Reset scrolling lock after a short delay
             setTimeout(() => {
                 isScrolling = false;
-            }, 200);
+            }, 150);
         });
     </script>
 </body>
