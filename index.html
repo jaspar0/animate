@@ -5,7 +5,7 @@
         body {
             margin: 0;
             height: 500vh;
-            background: transparent;
+            background: white;  /* White background to clearly see test squares */
         }
 
         .container {
@@ -13,28 +13,27 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 500px;  /* Fixed container size */
+            height: 500px;
+            border: 2px solid black;  /* Border to see container bounds */
+            background: white;
         }
 
         .frame {
             position: absolute;
-            width: 300px;  /* Fixed size for testing */
-            height: 300px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             opacity: 0;
-            /* Semi-transparent colors so we can see stacking */
-            background-color: rgba(255, 0, 0, 0.3);
-            border: 2px solid black;
+            transition: opacity 0.2s ease;
         }
 
-        /* Different colors for each frame */
-        .frame:nth-child(1) { background-color: rgba(255, 0, 0, 0.3); }
-        .frame:nth-child(2) { background-color: rgba(0, 255, 0, 0.3); }
-        .frame:nth-child(3) { background-color: rgba(0, 0, 255, 0.3); }
-        .frame:nth-child(4) { background-color: rgba(255, 255, 0, 0.3); }
+        /* Distinct colors for each frame */
+        #frame1 { background-color: rgba(255, 0, 0, 0.5); }    /* Red */
+        #frame2 { background-color: rgba(0, 255, 0, 0.5); }    /* Green */
+        #frame3 { background-color: rgba(0, 0, 255, 0.5); }    /* Blue */
+        #frame4 { background-color: rgba(255, 255, 0, 0.5); }  /* Yellow */
 
         .debug {
             position: fixed;
@@ -46,8 +45,6 @@
             font-family: monospace;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-height: 80vh;
-            overflow-y: auto;
         }
 
         .reset-button {
@@ -70,23 +67,18 @@
 <body>
     <div class="debug">Real-time Frame States:</div>
     <button class="reset-button">Reset Animation</button>
-    <div class="container"></div>
+    <div class="container">
+        <!-- Only colored divs, no images -->
+        <div id="frame1" class="frame"></div>
+        <div id="frame2" class="frame"></div>
+        <div id="frame3" class="frame"></div>
+        <div id="frame4" class="frame"></div>
+    </div>
 
     <script>
-        const container = document.querySelector('.container');
+        const frames = document.querySelectorAll('.frame');
         const debug = document.querySelector('.debug');
         const resetButton = document.querySelector('.reset-button');
-        const frames = [];
-
-        // Create test frames (only 4 for testing)
-        for (let i = 0; i < 4; i++) {
-            const frame = document.createElement('div');
-            frame.className = 'frame';
-            frame.id = `frame${i + 1}`;
-            frame.style.zIndex = i;  // Crucial for stacking order
-            container.appendChild(frame);
-            frames.push(frame);
-        }
 
         function updateDebugDisplay() {
             let debugContent = 'Real-time Frame States:\n';
@@ -99,9 +91,7 @@
 
         function activateFramesUpTo(frameIndex) {
             frames.forEach((frame, index) => {
-                if (index <= frameIndex) {
-                    frame.style.opacity = '1';
-                }
+                frame.style.opacity = index <= frameIndex ? '1' : '0';
             });
             updateDebugDisplay();
         }
