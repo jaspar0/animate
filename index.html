@@ -14,7 +14,7 @@
         }
         
         body {
-            height: 300vh; /* Reduced scroll height since we don't need infinite scroll */
+            height: 300vh; /* Adjusted for scrolling */
             background: #f0f0f0;
             overscroll-behavior: none;
         }
@@ -107,12 +107,12 @@
             
             if (newFrame !== currentFrame) {
                 if (newFrame > currentFrame) {
-                    // Scrolling forward: make all frames up to current frame visible
-                    for (let i = 0; i <= newFrame; i++) {
+                    // Scrolling forward: make all frames up to the new frame visible
+                    for (let i = currentFrame + 1; i <= newFrame; i++) {
                         frames[i].style.opacity = 1;
                     }
                 } else {
-                    // Scrolling backward: hide frames from the end
+                    // Scrolling backward: hide frames beyond the new frame
                     for (let i = currentFrame; i > newFrame; i--) {
                         frames[i].style.opacity = 0;
                     }
