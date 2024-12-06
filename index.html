@@ -46,6 +46,7 @@
             z-index: 1000;
             font-family: monospace;
             border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .frame-status {
@@ -59,23 +60,38 @@
             font-family: monospace;
             border-radius: 4px;
             max-width: 80vw;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
+        /* Updated Reset Button Styles */
         .reset-button {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #ccc;
+            bottom: 20px; /* Moved to bottom */
+            left: 50%; /* Centered horizontally */
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: #2196F3; /* Blue background */
+            color: white;
+            border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-family: monospace;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
             z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
         }
 
         .reset-button:hover {
-            background: rgba(240, 240, 240, 0.9);
+            background: #1976D2;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        .reset-button:active {
+            background: #1565C0;
+            transform: translateX(-50%) translateY(0px);
         }
     </style>
 </head>
@@ -121,7 +137,10 @@
 
         function resetAnimation() {
             // Reset scroll position
-            window.scrollTo(0, 0);
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
             
             // Reset all frames to invisible
             frames.forEach(frame => {
