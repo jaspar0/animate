@@ -99,7 +99,7 @@
         let lastScrollY = window.scrollY;
         let accumulatedProgress = 0;
         let scrollTimeout = null;
-        let lastDirection = 0; // Track scroll direction: 1 for forward, -1 for backward
+        let frameStates = new Array(totalFrames).fill(false); // Track visibility of each frame
         
         // Generate frames
         for (let i = 0; i < totalFrames; i++) {
@@ -124,8 +124,8 @@
             const currentScrollY = window.scrollY;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
             
-            // Determine scroll direction
-            const currentDirection = currentScrollY > lastScrollY ? 1 : -1;
+            // Calculate scroll direction
+            const scrollDirection = currentScrollY > lastScrollY ? 1 : -1;
             
             // Calculate scroll difference and update accumulated progress
             if (currentScrollY !== lastScrollY) {
@@ -154,15 +154,22 @@
                 const wrappedProgress = ((accumulatedProgress % totalFrames) + totalFrames) % totalFrames;
                 const currentFrame = Math.floor(wrappedProgress);
                 
-                // Update frame visibilities based on direction and position
-                frames.forEach((frame, index) => {
-                    if (currentDirection === 1) {
-                        // Forward scrolling: accumulate layers
-                        frame.style.opacity = index <= currentFrame ? 1 : 0;
-                    } else {
-                        // Backward scrolling: remove layers
-                        frame.style.opacity = index <= currentFrame ? 1 : 0;
+                // Update frame states based on scroll direction
+                if (scrollDirection > 0) {
+                    // Forward scrolling: reveal frames up to current
+                    for (let i = 0; i <= currentFrame; i++) {
+                        frameStates[i] = true;
                     }
+                } else {
+                    // Backward scrolling: hide frames after current
+                    for (let i = currentFrame + 1; i < totalFrames; i++) {
+                        frameStates[i] = false;
+                    }
+                }
+                
+                // Apply visibility based on frame states
+                frames.forEach((frame, index) => {
+                    frame.style.opacity = frameStates[index] ? 1 : 0;
                 });
                 
                 // Update progress display
@@ -171,8 +178,6 @@
                 
                 ticking = false;
             });
-            
-            lastDirection = currentDirection;
         }
         
         // Handle scroll events
@@ -183,11 +188,12 @@
             }
         }, { passive: true });
 
-        // Initialize scroll position
+        // Initialize scroll position and first frame
         window.addEventListener('load', () => {
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
             window.scrollTo(0, maxScroll / 2);
             lastScrollY = maxScroll / 2;
+            frameStates[0] = true; // Make first frame visible initially
             updateAnimation();
         });
     </script>
