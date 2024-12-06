@@ -28,6 +28,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            /* Key change: each frame gets progressively higher z-index */
         }
 
         .frame img {
@@ -42,7 +43,7 @@
             left: 20px;
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
-            z-index: 1000;
+            z-index: 1001; /* Above all frames */
             font-family: monospace;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -64,35 +65,12 @@
             font-family: system-ui, -apple-system, sans-serif;
             font-size: 16px;
             font-weight: bold;
-            z-index: 1000;
+            z-index: 1001; /* Above all frames */
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .reset-button:hover {
             background: #1976D2;
-        }
-
-        /* Style for frame state display */
-        .state-row {
-            display: flex;
-            gap: 10px;
-            margin: 2px 0;
-        }
-
-        .state-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
-        }
-
-        .state-on {
-            background: #4CAF50;
-        }
-
-        .state-off {
-            background: #f44336;
         }
     </style>
 </head>
@@ -107,47 +85,33 @@
         const resetButton = document.querySelector('.reset-button');
         const frames = [];
 
-        // Create frames
+        // Create frames with proper stacking
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
             frame.id = `frame${i + 1}`;
+            frame.style.zIndex = i; // Key change: each frame gets its own z-index
             frame.innerHTML = `<img src="sigil_12_06/sig${i + 1}.png">`;
             container.appendChild(frame);
             frames.push(frame);
         }
 
-        function getActualFrameStates() {
-            return frames.map(frame => {
-                return {
-                    id: frame.id,
-                    opacity: parseFloat(frame.style.opacity) || 0
-                };
-            });
-        }
-
         function updateDebugDisplay() {
-            const states = getActualFrameStates();
-            let debugContent = 'Real-time Frame States:\n';
-            
-            states.forEach(({id, opacity}, index) => {
-                const isVisible = opacity > 0;
-                debugContent += `
-                    <div class="state-row">
-                        <span class="state-indicator ${isVisible ? 'state-on' : 'state-off'}"></span>
-                        Frame ${index + 1}: ${isVisible ? 'VISIBLE' : 'hidden'} (opacity: ${opacity})
-                    </div>
-                `;
+            let debugContent = 'Visible Frames:\n';
+            frames.forEach((frame, index) => {
+                const isVisible = frame.style.opacity === '1';
+                debugContent += `Frame ${index + 1}: ${isVisible ? 'VISIBLE' : 'hidden'}\n`;
             });
-            
-            debug.innerHTML = debugContent;
+            debug.textContent = debugContent;
         }
 
         function activateFramesUpTo(frameIndex) {
-            console.log(`Setting frames up to ${frameIndex} visible`);
+            // CRUCIAL CHANGE: Keep all previous frames visible
             frames.forEach((frame, index) => {
-                // Make all frames up to frameIndex visible
-                frame.style.opacity = index <= frameIndex ? '1' : '0';
+                if (index <= frameIndex) {
+                    frame.style.opacity = '1';
+                }
+                // Don't set opacity to 0 for other frames - let them stay visible
             });
             updateDebugDisplay();
         }
@@ -163,7 +127,6 @@
             });
             
             updateDebugDisplay();
-            console.log('Animation reset');
         }
 
         window.addEventListener('scroll', () => {
@@ -176,9 +139,6 @@
 
         // Initialize
         resetAnimation();
-        
-        // Update debug display periodically to catch any changes
-        setInterval(updateDebugDisplay, 100);
     </script>
 </body>
 </html>
