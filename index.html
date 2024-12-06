@@ -5,7 +5,7 @@
         body {
             margin: 0;
             height: 500vh;
-            background: white;
+            background: transparent;
         }
 
         .container {
@@ -13,64 +13,39 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90vw; /* Make container bigger */
+            width: 90vw;
             height: 90vh;
-            border: 2px solid black;
-            background: white;
+            background: transparent;
         }
 
-        /* Remove transform from .frame class */
         .frame {
             position: absolute;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            /* Center each frame */
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            /* Add border to clearly see boundaries */
-            border: 3px solid black;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none; /* Prevent interaction */
         }
 
-        /* Very distinct sizes */
-        #frame1 {
-            width: 80vh;  /* Much bigger */
-            height: 80vh;
-            background-color: rgba(255, 0, 0, 0.5);
-            z-index: 1;
+        /* Dynamic image scaling */
+        .frame img {
+            width: 100%; /* Scale images proportionally */
+            height: 100%;
+            object-fit: contain; /* Keep aspect ratio */
+            display: block;
         }
 
-        #frame2 {
-            width: 60vh;  /* Big */
-            height: 60vh;
-            background-color: rgba(0, 255, 0, 0.5);
-            z-index: 2;
-        }
-
-        #frame3 {
-            width: 40vh;  /* Medium */
-            height: 40vh;
-            background-color: rgba(0, 0, 255, 0.5);
-            z-index: 3;
-        }
-
-        #frame4 {
-            width: 20vh;  /* Small */
-            height: 20vh;
-            background-color: rgba(255, 255, 0, 0.5);
-            z-index: 4;
-        }
-
+        /* Debug UI */
         .debug {
             position: fixed;
             top: 20px;
             left: 20px;
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
-            z-index: 1001;
+            z-index: 2000;
             font-family: monospace;
             border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .reset-button {
@@ -86,39 +61,55 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            z-index: 1001;
+            z-index: 2000;
         }
     </style>
 </head>
 <body>
     <div class="debug">Real-time Frame States:</div>
     <button class="reset-button">Reset Animation</button>
-    <div class="container">
-        <div id="frame1" class="frame"></div>
-        <div id="frame2" class="frame"></div>
-        <div id="frame3" class="frame"></div>
-        <div id="frame4" class="frame"></div>
-    </div>
+    <div class="container"></div>
 
     <script>
-        const frames = document.querySelectorAll('.frame');
+        const container = document.querySelector('.container');
         const debug = document.querySelector('.debug');
         const resetButton = document.querySelector('.reset-button');
+        const frames = [];
+
+        // Create 20 frames with progressively smaller sizes
+        for (let i = 0; i < 20; i++) {
+            const frame = document.createElement('div');
+            frame.className = 'frame';
+            frame.style.zIndex = 20 - i; // Larger frames underneath smaller ones
+            
+            const img = document.createElement('img');
+            img.src = `sigil_12_06/sig${i + 1}.png`;
+            img.alt = `Frame ${i + 1}`;
+            img.style.width = `${90 - i * 5}%`; // Progressive scaling
+            img.style.height = `${90 - i * 5}%`; // Maintain aspect ratio
+            
+            frame.appendChild(img);
+            container.appendChild(frame);
+            frames.push(frame);
+
+            img.onload = () => console.log(`Image ${i + 1} loaded`);
+            img.onerror = () => console.error(`Image ${i + 1} failed to load`);
+        }
 
         function updateDebugDisplay() {
             let debugContent = 'Real-time Frame States:\n';
             frames.forEach((frame, index) => {
                 const opacity = frame.style.opacity || '0';
-                const size = frame.getBoundingClientRect();
                 debugContent += `Frame ${index + 1}: ${opacity === '1' ? 'VISIBLE' : 'hidden'} (opacity: ${opacity})\n`;
-                debugContent += `   Size: ${Math.round(size.width)}x${Math.round(size.height)}px\n`;
             });
             debug.textContent = debugContent;
         }
 
         function activateFramesUpTo(frameIndex) {
             frames.forEach((frame, index) => {
-                frame.style.opacity = index <= frameIndex ? '1' : '0';
+                if (index <= frameIndex) {
+                    frame.style.opacity = '1';
+                }
             });
             updateDebugDisplay();
         }
@@ -128,17 +119,17 @@
                 top: 0,
                 behavior: 'smooth'
             });
-            
+
             frames.forEach(frame => {
                 frame.style.opacity = '0';
             });
-            
+
             updateDebugDisplay();
         }
 
         window.addEventListener('scroll', () => {
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            const frameToShow = Math.min(Math.floor(scrollPercent * 4), 3);
+            const frameToShow = Math.min(Math.floor(scrollPercent * 20), 19);
             activateFramesUpTo(frameToShow);
         });
 
