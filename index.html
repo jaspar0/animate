@@ -119,7 +119,9 @@
         const stateList = document.querySelector('.state-list');
         const frames = [];
         const stateItems = [];
-        let currentFrameIndex = 0;
+        const scrollThreshold = 100; // Sensitivity for scroll progression
+        let scrollDelta = 0; // Accumulated scroll value
+        let currentFrameIndex = 0; // Start at Frame 0
 
         // Define custom names for the frames (including Frame 0)
         const frameNames = [
@@ -188,6 +190,28 @@
                 item.classList.toggle('active', i === index);
             });
         }
+
+        // Scroll handling
+        window.addEventListener('wheel', (event) => {
+            scrollDelta += event.deltaY;
+
+            if (Math.abs(scrollDelta) >= scrollThreshold) {
+                const direction = scrollDelta > 0 ? 1 : -1;
+                let newFrameIndex = currentFrameIndex + direction;
+
+                // Infinite scrolling logic
+                if (newFrameIndex > frames.length - 1) {
+                    newFrameIndex = 0;
+                } else if (newFrameIndex < 0) {
+                    newFrameIndex = frames.length - 1;
+                }
+
+                currentFrameIndex = newFrameIndex;
+                updateActiveFrame(newFrameIndex);
+
+                scrollDelta = 0;
+            }
+        });
 
         updateActiveFrame(0); // Initialize
     </script>
