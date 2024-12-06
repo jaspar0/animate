@@ -4,8 +4,8 @@
     <style>
         body {
             margin: 0;
-            height: 500vh; /* Allow for scroll testing */
-            background: transparent;
+            height: 500vh; /* Allows scrolling to trigger frame visibility */
+            background: #eaeaea;
         }
 
         .container {
@@ -13,23 +13,27 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: auto; /* Match the size of the images */
-            height: auto; /* Match the size of the images */
             background: transparent;
+            width: auto;
+            height: auto;
         }
 
         .frame {
             position: absolute;
             top: 0;
             left: 0;
+            width: 500px; /* Adjust to your image size */
+            height: 500px; /* Adjust to your image size */
             opacity: 0;
             transition: opacity 0.2s ease-in-out;
+            background: rgba(0, 0, 0, 0.1); /* Fallback background */
         }
 
         .frame img {
-            display: block; /* Removes any extra space below images */
-            max-width: 100%; /* Ensure image fits inside its parent */
-            max-height: 100%; /* Maintain aspect ratio */
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .debug {
@@ -38,7 +42,7 @@
             left: 20px;
             background: rgba(255, 255, 255, 0.9);
             padding: 10px;
-            z-index: 2000; /* Above all frames */
+            z-index: 1000;
             font-family: monospace;
             border-radius: 4px;
         }
@@ -56,12 +60,12 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            z-index: 2000;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <div class="debug">Real-time Frame States:</div>
+    <div class="debug">Scroll to activate frames.</div>
     <button class="reset-button">Reset Animation</button>
     <div class="container"></div>
 
@@ -75,25 +79,28 @@
         for (let i = 0; i < 20; i++) {
             const frame = document.createElement('div');
             frame.className = 'frame';
-            frame.style.zIndex = 20 - i; // Larger frames underneath smaller ones
-            
+            frame.style.zIndex = 20 - i; // Proper stacking order
+
             const img = document.createElement('img');
-            img.src = `sigil_12_06/sig${i + 1}.png`;
+            img.src = `sigil_12_06/sig${i + 1}.png`; // Ensure this path is correct
             img.alt = `Frame ${i + 1}`;
-            
+
             frame.appendChild(img);
             container.appendChild(frame);
             frames.push(frame);
 
             img.onload = () => console.log(`Image ${i + 1} loaded`);
-            img.onerror = () => console.error(`Image ${i + 1} failed to load`);
+            img.onerror = () => {
+                console.error(`Image ${i + 1} failed to load`);
+                frame.style.background = 'rgba(255, 0, 0, 0.2)'; // Red background for missing images
+            };
         }
 
         function updateDebugDisplay() {
             let debugContent = 'Real-time Frame States:\n';
             frames.forEach((frame, index) => {
                 const opacity = frame.style.opacity || '0';
-                debugContent += `Frame ${index + 1}: ${opacity === '1' ? 'VISIBLE' : 'hidden'} (opacity: ${opacity})\n`;
+                debugContent += `Frame ${index + 1}: ${opacity === '1' ? 'VISIBLE' : 'hidden'}\n`;
             });
             debug.textContent = debugContent;
         }
@@ -101,7 +108,7 @@
         function activateFramesUpTo(frameIndex) {
             frames.forEach((frame, index) => {
                 if (index <= frameIndex) {
-                    frame.style.opacity = '1';
+                    frame.style.opacity = '1'; // Make visible
                 }
             });
             updateDebugDisplay();
@@ -110,11 +117,11 @@
         function resetAnimation() {
             window.scrollTo({
                 top: 0,
-                behavior: 'smooth'
+                behavior: 'smooth',
             });
 
             frames.forEach(frame => {
-                frame.style.opacity = '0';
+                frame.style.opacity = '0'; // Reset visibility
             });
 
             updateDebugDisplay();
