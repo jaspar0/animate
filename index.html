@@ -1,34 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cumulative Layer Animation</title>
+    <title>Flipbook Animation</title>
     <style>
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow-x: hidden;
-        }
-        
-        body {
-            height: 300vh; /* Adjusted for scrolling */
-            background: #f0f0f0;
-            overscroll-behavior: none;
+            overflow: hidden; /* No infinite scrolling */
         }
 
-        .animation-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+        body {
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #f0f0f0;
+        }
+
+        .animation-container {
+            position: relative;
+            width: 80vw;
+            height: 80vh;
             background: white;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ccc;
         }
 
         .frame {
@@ -38,11 +39,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.15s linear;
+            transition: opacity 0.2s ease-in-out;
         }
 
         .frame img {
@@ -56,7 +53,7 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 10px 20px;
             border-radius: 20px;
@@ -68,58 +65,59 @@
 <body>
     <div class="scroll-progress">Frame: 1/20</div>
     <div class="animation-container">
-        <div id="frames-container">
-            <!-- Frames will be inserted here by JavaScript -->
-        </div>
+        <div id="frames-container"></div>
     </div>
 
     <script>
         const totalFrames = 20;
         const framesContainer = document.getElementById('frames-container');
         const progressElement = document.querySelector('.scroll-progress');
-        
+        let currentFrame = 0;
+
         // Generate frames
-        for (let i = 0; i < totalFrames; i++) {
+        for (let i = 1; i <= totalFrames; i++) {
             const frame = document.createElement('div');
-            frame.className = 'frame';
-            
-            frame.innerHTML = `
-                <img 
-                    src="sigil_12_06/sig${i + 1}.png" 
-                    alt="Animation Frame ${i + 1}"
-                >
-            `;
-            
+            frame.classList.add('frame');
+            frame.innerHTML = `<img src="sigil_12_06/sig${i}.png" alt="Frame ${i}">`;
             framesContainer.appendChild(frame);
         }
 
         const frames = document.querySelectorAll('.frame');
-        let currentFrame = 0;
 
-        // Make the first frame visible initially
+        // Ensure only the first frame is initially visible
         frames[0].style.opacity = 1;
 
-        // Handle scroll events
-        window.addEventListener('scroll', () => {
-            // Calculate the new frame based on scroll position
-            const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            const newFrame = Math.min(Math.floor(scrollPercent * totalFrames), totalFrames - 1);
-            
-            if (newFrame !== currentFrame) {
-                if (newFrame > currentFrame) {
-                    // Scrolling forward: Make all layers up to newFrame visible
-                    for (let i = currentFrame + 1; i <= newFrame; i++) {
-                        frames[i].style.opacity = 1;
-                    }
-                } else {
-                    // Scrolling backward: Make all layers after newFrame invisible
-                    for (let i = currentFrame; i > newFrame; i--) {
-                        frames[i].style.opacity = 0;
-                    }
-                }
-                currentFrame = newFrame;
-                progressElement.textContent = `Frame: ${currentFrame + 1}/${totalFrames}`;
+        // Track scroll progress
+        let isScrolling = false;
+
+        const updateFrames = (direction) => {
+            if (direction === 'forward' && currentFrame < totalFrames - 1) {
+                currentFrame++;
+                frames[currentFrame].style.opacity = 1; // Make the next frame visible
+            } else if (direction === 'backward' && currentFrame > 0) {
+                frames[currentFrame].style.opacity = 0; // Make the current frame invisible
+                currentFrame--;
             }
+            progressElement.textContent = `Frame: ${currentFrame + 1}/${totalFrames}`;
+        };
+
+        // Listen for scroll events
+        window.addEventListener('wheel', (event) => {
+            if (isScrolling) return; // Prevent rapid-fire scrolling
+            isScrolling = true;
+
+            if (event.deltaY > 0) {
+                // Scrolling down
+                updateFrames('forward');
+            } else if (event.deltaY < 0) {
+                // Scrolling up
+                updateFrames('backward');
+            }
+
+            // Allow scrolling again after a short delay
+            setTimeout(() => {
+                isScrolling = false;
+            }, 200);
         });
     </script>
 </body>
