@@ -1,20 +1,25 @@
-<!-- Embed this in Webflow's Embed Block -->
-<div class="custom-animation">
-    <div class="main-container">
-        <div class="container"></div>
-        <div class="state-list"></div>
-    </div>
+<!DOCTYPE html>
+<html>
+<head>
     <style>
-        .custom-animation {
+        /* Prevent scrolling and make the webpage transparent */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Disable default scrolling */
+            height: 100%;
             width: 100%;
-            height: 100vh;
-            position: relative;
-            background: transparent;
-            overflow: hidden;
+            background: transparent; /* Transparent background */
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Main container for the image and state list */
-        .custom-animation .main-container {
+        .main-container {
             display: flex;
             flex-direction: row; /* Desktop layout */
             width: 100%;
@@ -22,7 +27,7 @@
         }
 
         /* Animation container */
-        .custom-animation .container {
+        .container {
             position: relative;
             flex: 1;
             width: 100%;
@@ -30,7 +35,7 @@
         }
 
         /* Center each frame absolutely within the container */
-        .custom-animation .frame {
+        .frame {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -41,7 +46,7 @@
             transition: opacity 0.2s ease-in-out;
         }
 
-        .custom-animation .frame img {
+        .frame img {
             display: block;
             width: 100%;
             height: 100%;
@@ -49,7 +54,7 @@
         }
 
         /* State list (desktop: vertical on the left) */
-        .custom-animation .state-list {
+        .state-list {
             display: flex;
             flex-direction: column; /* Vertical layout */
             align-items: flex-start; /* Left-align items */
@@ -62,7 +67,7 @@
         }
 
         /* State item */
-        .custom-animation .state-item {
+        .state-item {
             margin: 5px 0;
             font-family: 'IBM Plex Mono', monospace;
             font-size: 1rem;
@@ -73,18 +78,18 @@
         }
 
         /* Highlighted active state */
-        .custom-animation .state-item.active {
+        .state-item.active {
             opacity: 1;
             transform: scale(1.1);
         }
 
         /* Horizontal list for mobile */
         @media (max-width: 900px) {
-            .custom-animation .main-container {
+            .main-container {
                 flex-direction: column; /* Stack vertically on mobile */
             }
 
-            .custom-animation .state-list {
+            .state-list {
                 flex-direction: row; /* Horizontal layout */
                 justify-content: flex-start;
                 align-items: center;
@@ -95,133 +100,136 @@
                 white-space: nowrap;
             }
 
-            .custom-animation .state-item {
+            .state-item {
                 display: inline-block; /* Inline for horizontal scrolling */
                 margin: 0 10px;
                 font-size: 0.9rem;
             }
         }
     </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="container"></div>
+        <div class="state-list"></div>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const container = document.querySelector(".custom-animation .container");
-            const stateList = document.querySelector(".custom-animation .state-list");
-            const frames = [];
-            const stateItems = [];
-            const scrollThreshold = 100; // Sensitivity for scroll progression
-            let scrollDelta = 0; // Accumulated scroll value
-            let currentFrameIndex = 0; // Start at Frame 0
+        const container = document.querySelector('.container');
+        const stateList = document.querySelector('.state-list');
+        const frames = [];
+        const stateItems = [];
+        const scrollThreshold = 100; // Sensitivity for scroll progression
+        let scrollDelta = 0; // Accumulated scroll value
+        let currentFrameIndex = 0; // Start at Frame 0
 
-            // Define custom names for the frames (including Frame 0)
-            const frameNames = [
-                "00_KHAOS",
-                "01_VOID",
-                "02_AETHER",
-                "03_FLARE",
-                "04_FUSION",
-                "05_TERRA",
-                "06_AQUA",
-                "07_PLASMA_LUX",
-                "08_GAIA",
-                "09_ANIMA",
-                "10_ARCHE",
-                "11_MATERIA",
-                "12_PRESENCE",
-                "13_KHAOS_REBORN",
-                "14_DARK_MATTER",
-                "15_ANTIMATTER",
-                "16_SYNTHESIS",
-                "17_GENIUS_LOCI",
-                "18_CHRONOS",
-                "19_ETHOS",
-                "20_UNIVERSE",
-                "21_HARMONY",
-            ];
+        // Define custom names for the frames (including Frame 0)
+        const frameNames = [
+            "00_KHAOS",
+            "01_VOID",
+            "02_AETHER",
+            "03_FLARE",
+            "04_FUSION",
+            "05_TERRA",
+            "06_AQUA",
+            "07_PLASMA_LUX",
+            "08_GAIA",
+            "09_ANIMA",
+            "10_ARCHE",
+            "11_MATERIA",
+            "12_PRESENCE",
+            "13_KHAOS_REBORN",
+            "14_DARK_MATTER",
+            "15_ANTIMATTER",
+            "16_SYNTHESIS",
+            "17_GENIUS_LOCI",
+            "18_CHRONOS",
+            "19_ETHOS",
+            "20_UNIVERSE",
+            "21_HARMONY"
+        ];
 
-            // Create frames and state items
-            frameNames.forEach((name, index) => {
-                // Create frame
-                const frame = document.createElement("div");
-                frame.className = "frame";
-                frame.style.zIndex = frameNames.length - index;
+        // Create frames and state items
+        frameNames.forEach((name, index) => {
+            // Create frame
+            const frame = document.createElement('div');
+            frame.className = 'frame';
+            frame.style.zIndex = frameNames.length - index;
 
-                if (index > 0) {
-                    const img = document.createElement("img");
-                    img.src = `https://example.com/sigil_${index}.png`; // Replace with correct Webflow asset paths
-                    img.alt = name;
-                    img.onerror = () => {
-                        console.error(`Image not found: sigil_${index}.png`);
-                        frame.style.display = "none"; // Hide frame if image is missing
-                    };
-                    frame.appendChild(img);
-                }
-
-                container.appendChild(frame);
-                frames.push(frame);
-
-                // Create state item
-                const stateItem = document.createElement("div");
-                stateItem.className = "state-item";
-                stateItem.textContent = name;
-                stateList.appendChild(stateItem);
-                stateItems.push(stateItem);
-
-                // Click handler
-                stateItem.addEventListener("click", () => {
-                    currentFrameIndex = index;
-                    updateActiveFrame(index);
-                });
-            });
-
-            // Update active frame
-            function updateActiveFrame(index) {
-                frames.forEach((frame, i) => {
-                    frame.style.opacity = i <= index ? "1" : "0";
-                });
-
-                stateItems.forEach((item, i) => {
-                    item.classList.toggle("active", i === index);
-                });
-
-                // Sync horizontal scroll position (mobile)
-                if (window.innerWidth <= 900) {
-                    const activeItem = stateItems[index];
-                    if (activeItem) {
-                        const offset =
-                            activeItem.offsetLeft +
-                            activeItem.offsetWidth / 2 -
-                            window.innerWidth / 2;
-                        stateList.scrollTo({
-                            left: offset,
-                            behavior: "smooth",
-                        });
-                    }
-                }
+            if (index > 0) {
+                const img = document.createElement('img');
+                img.src = `sigil_12_06/sig${index}.png`;
+                img.alt = name;
+                img.onerror = () => {
+                    console.error(`Image not found: sigil_12_06/sig${index}.png`);
+                    frame.style.display = 'none'; // Hide frame if image is missing
+                };
+                frame.appendChild(img);
             }
 
-            // Scroll handling
-            window.addEventListener("wheel", (event) => {
-                scrollDelta += event.deltaY;
+            container.appendChild(frame);
+            frames.push(frame);
 
-                if (Math.abs(scrollDelta) >= scrollThreshold) {
-                    const direction = scrollDelta > 0 ? 1 : -1;
-                    let newFrameIndex = currentFrameIndex + direction;
+            // Create state item
+            const stateItem = document.createElement('div');
+            stateItem.className = 'state-item';
+            stateItem.textContent = name;
+            stateList.appendChild(stateItem);
+            stateItems.push(stateItem);
 
-                    // Infinite scrolling logic
-                    if (newFrameIndex > frames.length - 1) {
-                        newFrameIndex = 0;
-                    } else if (newFrameIndex < 0) {
-                        newFrameIndex = frames.length - 1;
-                    }
+            // Click handler
+            stateItem.addEventListener('click', () => {
+                currentFrameIndex = index;
+                updateActiveFrame(index);
+            });
+        });
 
-                    currentFrameIndex = newFrameIndex;
-                    updateActiveFrame(newFrameIndex);
-
-                    scrollDelta = 0;
-                }
+        // Update active frame
+        function updateActiveFrame(index) {
+            frames.forEach((frame, i) => {
+                frame.style.opacity = i <= index ? '1' : '0';
             });
 
-            updateActiveFrame(0); // Initialize
+            stateItems.forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+
+            // Sync horizontal scroll position (mobile)
+            if (window.innerWidth <= 900) {
+                const activeItem = stateItems[index];
+                if (activeItem) {
+                    const offset = activeItem.offsetLeft + activeItem.offsetWidth / 2 - window.innerWidth / 2;
+                    stateList.scrollTo({
+                        left: offset,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+
+        // Scroll handling
+        window.addEventListener('wheel', (event) => {
+            scrollDelta += event.deltaY;
+
+            if (Math.abs(scrollDelta) >= scrollThreshold) {
+                const direction = scrollDelta > 0 ? 1 : -1;
+                let newFrameIndex = currentFrameIndex + direction;
+
+                // Infinite scrolling logic
+                if (newFrameIndex > frames.length - 1) {
+                    newFrameIndex = 0;
+                } else if (newFrameIndex < 0) {
+                    newFrameIndex = frames.length - 1;
+                }
+
+                currentFrameIndex = newFrameIndex;
+                updateActiveFrame(newFrameIndex);
+
+                scrollDelta = 0;
+            }
         });
+
+        updateActiveFrame(0); // Initialize
     </script>
-</div>
+</body>
+</html>
