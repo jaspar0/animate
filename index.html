@@ -5,56 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Animation</title>
     <style>
-        /* Reset and structure */
         html, body {
             margin: 0;
             padding: 0;
+            overflow: hidden;
             height: 100%;
             width: 100%;
-        }
-
-        body {
+            background: transparent;
             display: flex;
-            flex-direction: column; /* Stack page content */
-            justify-content: flex-start; /* Align content from the top */
-        }
-
-        /* General container styling */
-        .page-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
         }
 
-        /* Text block styling */
-        .text-block {
-            width: 90%;
-            text-align: center;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.5rem;
-            color: black;
-            margin: 2rem 0; /* Add space above and below */
-        }
-
-        /* Animation wrapper */
-        .animation-container {
-            width: 100%;
-            max-width: 900px;
-            aspect-ratio: 16 / 9; /* Maintain a responsive aspect ratio */
-            overflow: hidden;
-            position: relative;
-        }
-
-        .animation {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .main-container {
+            display: flex;
+            flex-direction: row; /* Desktop layout */
             width: 100%;
             height: 100%;
+            background: transparent;
         }
 
-        /* Frame styling */
+        .container {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            background: transparent;
+        }
+
         .frame {
             position: absolute;
             top: 50%;
@@ -73,21 +50,20 @@
             object-fit: contain;
         }
 
-        /* State list styling */
         .state-list {
             display: flex;
-            flex-direction: row; /* Horizontal layout */
-            overflow-x: auto; /* Allow horizontal scrolling for states */
-            overflow-y: hidden;
-            width: 100%;
+            flex-direction: column; /* Vertical for desktop */
+            align-items: flex-start;
             justify-content: center;
-            align-items: center;
-            padding: 0.5rem 1rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 15%;
+            padding: 0 3rem 2rem;
             background: transparent;
         }
 
         .state-item {
-            margin: 0 10px;
+            margin: 5px 0;
             font-family: 'IBM Plex Mono', monospace;
             font-size: 1rem;
             color: black;
@@ -102,34 +78,39 @@
         }
 
         @media (max-width: 768px) {
-            .text-block {
-                font-size: 1.2rem;
-                margin: 1.5rem 0;
+            .main-container {
+                flex-direction: column; /* Stack for mobile */
+                height: 100vh;
             }
 
-            .animation-container {
-                aspect-ratio: 4 / 3;
+            .container {
+                height: 75%; /* Adjust animation height for mobile */
+            }
+
+            .state-list {
+                flex-direction: row; /* Horizontal for mobile */
+                overflow-x: auto;
+                overflow-y: hidden;
+                width: 100%;
+                justify-content: center;
+                align-items: center;
+                order: 2; /* Position below animation */
+                white-space: nowrap;
+                padding: 0.5rem 1rem;
             }
 
             .state-item {
+                display: inline-block;
+                margin: 0 10px;
                 font-size: 0.9rem;
-                margin: 0 8px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="page-container">
-        <!-- Add any content above the animation -->
-        <div class="text-block">Try scrolling through the animation below!</div>
-
-        <!-- Animation section -->
-        <div class="animation-container">
-            <div class="animation">
-                <div class="state-list"></div>
-                <div class="container"></div>
-            </div>
-        </div>
+    <div class="main-container">
+        <div class="state-list"></div>
+        <div class="container"></div>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -142,9 +123,9 @@
             let touchStartY = 0;
             let touchEndY = 0;
 
-            let scrollThreshold = 100;
+            let scrollThreshold = 100; // Default threshold
             if (window.innerWidth <= 768) {
-                scrollThreshold = 40;
+                scrollThreshold = 40; // Lower threshold for mobile
             }
 
             const frameNames = [
