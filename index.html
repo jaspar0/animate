@@ -58,7 +58,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             width: 15%;
-            padding: 0 3rem 2rem;
+            padding: 0 3rem 2rem; /* Adjusted padding for better spacing */
             background: transparent;
         }
 
@@ -77,13 +77,14 @@
             transform: scale(1.1);
         }
 
+        /* Mobile styles */
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
             }
 
             .container {
-                height: 80%;
+                height: 70%; /* Reduced height for better vertical spacing */
             }
 
             .state-list {
@@ -95,7 +96,7 @@
                 align-items: center;
                 order: 2;
                 white-space: nowrap;
-                padding: 0.5rem 1rem 1rem;
+                padding: 0.5rem 1rem 1rem; /* Adjusted padding for mobile */
             }
 
             .state-item {
@@ -122,9 +123,10 @@
             let touchStartY = 0;
             let touchEndY = 0;
 
-            let scrollThreshold = 100;
+            // Set scrollThreshold based on device type
+            let scrollThreshold = 100; // Default for desktop
             if (window.innerWidth <= 768) {
-                scrollThreshold = 40;
+                scrollThreshold = 40; // Lower threshold for mobile
             }
 
             const frameNames = [
