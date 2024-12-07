@@ -13,18 +13,25 @@
             width: 100%;
             background: transparent;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column; /* Stack elements vertically */
         }
 
         .main-container {
             display: flex;
-            flex-direction: row;
+            flex-direction: column; /* Stack text and animation vertically */
             width: 100%;
-            height: calc(100% - 2rem); /* Add a vertical margin */
+            height: 100%;
             background: transparent;
-            padding-top: 1rem; /* Add space at the top */
-            padding-bottom: 1rem; /* Add space at the bottom */
+        }
+
+        .text-block {
+            text-align: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.5rem;
+            color: black;
+            padding: 1rem 0;
+            background: transparent;
+            z-index: 10; /* Ensure it stays above the animation */
         }
 
         .container {
@@ -32,7 +39,6 @@
             flex: 1;
             overflow: hidden;
             background: transparent;
-            height: 90%; /* Ensure the animation stays balanced */
         }
 
         .frame {
@@ -61,7 +67,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             width: 15%;
-            padding: 0 3rem 2rem; /* Adjusted padding for better spacing */
+            padding: 0 3rem 2rem;
             background: transparent;
         }
 
@@ -80,17 +86,21 @@
             transform: scale(1.1);
         }
 
-        /* Mobile styles */
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
-                height: calc(100vh - 3rem); /* Reduce the height to ensure state list fits */
+                height: 100vh; /* Ensure everything fits in the viewport */
             }
-        
+
+            .text-block {
+                font-size: 1.2rem;
+                padding: 0.5rem 0;
+            }
+
             .container {
-                height: 65%; /* Reduce animation height to allow space for the state list */
+                height: 75%; /* Reduce animation height to fit state list */
             }
-        
+
             .state-list {
                 flex-direction: row;
                 overflow-x: auto;
@@ -98,11 +108,10 @@
                 width: 100%;
                 justify-content: center;
                 align-items: center;
-                order: 2; /* Ensure it comes below the animation */
+                order: 2;
                 white-space: nowrap;
-                padding: 0.5rem 1rem; /* Adjust padding for smaller screens */
+                padding: 0.5rem 1rem;
             }
-        }
 
             .state-item {
                 display: inline-block;
@@ -114,6 +123,7 @@
 </head>
 <body>
     <div class="main-container">
+        <div class="text-block">Try Scrolling!</div>
         <div class="state-list"></div>
         <div class="container"></div>
     </div>
@@ -128,10 +138,9 @@
             let touchStartY = 0;
             let touchEndY = 0;
 
-            // Set scrollThreshold based on device type
-            let scrollThreshold = 100; // Default for desktop
+            let scrollThreshold = 100;
             if (window.innerWidth <= 768) {
-                scrollThreshold = 40; // Lower threshold for mobile
+                scrollThreshold = 40;
             }
 
             const frameNames = [
