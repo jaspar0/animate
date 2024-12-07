@@ -85,9 +85,9 @@
             }
 
             .state-list {
-                position: absolute;
-                bottom: 0; /* Anchor to the bottom of the screen */
-                left: 0;
+                position: relative; /* Position relative instead of absolute */
+                bottom: auto; /* Remove bottom anchoring */
+                margin-top: 1rem; /* Add spacing below the animation */
                 width: 100%; /* Take full width */
                 flex-direction: row; /* Horizontal layout */
                 overflow-x: auto; /* Horizontal scrolling for state list */
@@ -109,8 +109,8 @@
 </head>
 <body>
     <div class="main-container">
-        <div class="state-list"></div>
         <div class="container"></div>
+        <div class="state-list"></div>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
