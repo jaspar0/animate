@@ -3,34 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flexible Animation</title>
+    <title>Responsive Animation</title>
     <style>
+        /* Reset styles and lock the body */
         html, body {
             margin: 0;
             padding: 0;
+            overflow: hidden; /* Prevent page scrolling */
             height: 100%;
             width: 100%;
             background: transparent;
         }
 
+        /* Main container setup */
         .main-container {
             display: flex;
             flex-direction: row; /* Horizontal layout for desktop */
             width: 100%;
-            height: calc(100vh - 50px); /* Deduct height for external content above */
+            height: calc(100vh - 50px); /* Adjust for top nav or text above */
             background: transparent;
         }
 
+        /* Animation container */
         .container {
             position: relative;
             flex: 1;
-            display: flex; /* Use flexbox for centering */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            overflow: hidden;
+            overflow: hidden; /* Ensure no scrolling */
             background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Vertically center animation */
         }
 
+        /* Animation frames */
         .frame {
             position: absolute;
             top: 50%;
@@ -49,15 +54,16 @@
             object-fit: contain;
         }
 
+        /* State list styling */
         .state-list {
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Vertical list for desktop */
             align-items: flex-start;
             justify-content: center;
-            overflow-y: auto;
+            overflow-y: auto; /* Vertical scrolling */
             overflow-x: hidden;
             width: 15%;
-            padding: 2rem 3rem 2rem;
+            padding: 0 3rem 2rem;
             background: transparent;
         }
 
@@ -76,22 +82,30 @@
             transform: scale(1.1);
         }
 
+        /* Mobile responsiveness */
         @media (max-width: 768px) {
             .main-container {
-                flex-direction: column;
-                height: 75vh; /* Adjust height for mobile */
+                flex-direction: column; /* Stack vertically */
+                align-items: center;
+                height: calc(100vh - 50px); /* Adjust height for mobile */
+            }
+
+            .container {
+                width: 100%;
+                height: 75%; /* Adjust height for animation on mobile */
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .state-list {
-                flex-direction: row;
-                overflow-x: auto;
+                flex-direction: row; /* Horizontal layout for mobile */
+                overflow-x: auto; /* Horizontal scrolling for state list */
                 overflow-y: hidden;
                 width: 100%;
                 justify-content: center;
                 align-items: center;
-                order: 2;
-                white-space: nowrap;
-                padding: 0.5rem 1rem;
+                padding: 0.5rem;
             }
 
             .state-item {
@@ -118,11 +132,13 @@
             let touchStartY = 0;
             let touchEndY = 0;
 
-            let scrollThreshold = 100;
+            // Adjust scroll threshold for mobile
+            let scrollThreshold = 100; // Default for desktop
             if (window.innerWidth <= 768) {
-                scrollThreshold = 40;
+                scrollThreshold = 40; // Lower threshold for mobile
             }
 
+            // Define frame names
             const frameNames = [
                 "00_KHAOS", "01_VOID", "02_AETHER", "03_FLARE", "04_FUSION",
                 "05_TERRA", "06_AQUA", "07_PLASMA_LUX", "08_GAIA", "09_ANIMA",
@@ -131,6 +147,7 @@
                 "18_CHRONOS", "19_ETHOS", "20_UNIVERSE", "21_HARMONY"
             ];
 
+            // Create frames and state list items
             frameNames.forEach((name, index) => {
                 const frame = document.createElement('div');
                 frame.className = 'frame';
@@ -164,6 +181,7 @@
                 });
             });
 
+            // Update active frame
             function updateActiveFrame(index) {
                 frames.forEach((frame, i) => {
                     frame.style.opacity = i <= index ? '1' : '0';
@@ -182,6 +200,7 @@
                 }
             }
 
+            // Touch handling for mobile
             container.addEventListener('touchstart', (e) => (touchStartY = e.touches[0].clientY));
             container.addEventListener('touchmove', (e) => {
                 touchEndY = e.touches[0].clientY;
@@ -201,6 +220,7 @@
                 }
             });
 
+            // Wheel scrolling for desktop
             window.addEventListener('wheel', (event) => {
                 event.preventDefault();
                 scrollDelta += event.deltaY;
