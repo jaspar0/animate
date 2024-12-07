@@ -3,25 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Animation</title>
+    <title>Flexible Animation</title>
     <style>
         html, body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
             height: 100%;
             width: 100%;
             background: transparent;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         .main-container {
             display: flex;
-            flex-direction: row; /* Desktop layout */
+            flex-direction: row; /* Horizontal layout for desktop */
             width: 100%;
-            height: 100%;
+            height: calc(100vh - 50px); /* Deduct height for external content above */
             background: transparent;
         }
 
@@ -52,7 +48,7 @@
 
         .state-list {
             display: flex;
-            flex-direction: column; /* Vertical for desktop */
+            flex-direction: column;
             align-items: flex-start;
             justify-content: center;
             overflow-y: auto;
@@ -79,22 +75,18 @@
 
         @media (max-width: 768px) {
             .main-container {
-                flex-direction: column; /* Stack for mobile */
-                height: 100vh;
-            }
-
-            .container {
-                height: 75%; /* Adjust animation height for mobile */
+                flex-direction: column;
+                height: 75vh; /* Adjust height for mobile */
             }
 
             .state-list {
-                flex-direction: row; /* Horizontal for mobile */
+                flex-direction: row;
                 overflow-x: auto;
                 overflow-y: hidden;
                 width: 100%;
                 justify-content: center;
                 align-items: center;
-                order: 2; /* Position below animation */
+                order: 2;
                 white-space: nowrap;
                 padding: 0.5rem 1rem;
             }
@@ -123,9 +115,9 @@
             let touchStartY = 0;
             let touchEndY = 0;
 
-            let scrollThreshold = 100; // Default threshold
+            let scrollThreshold = 100;
             if (window.innerWidth <= 768) {
-                scrollThreshold = 40; // Lower threshold for mobile
+                scrollThreshold = 40;
             }
 
             const frameNames = [
