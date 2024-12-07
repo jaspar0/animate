@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animation with State List</title>
+    <title>Responsive Animation with State List</title>
     <style>
         /* Transparent background */
         html, body {
@@ -22,10 +22,10 @@
         .main-container {
             display: flex;
             flex-direction: row;
-            width: 90%;
-            height: 90%;
-            background: transparent; /* Ensure container is transparent */
-            padding-bottom: 20px; /* Add padding to the bottom */
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            padding-bottom: 20px;
         }
 
         /* Animation container */
@@ -33,7 +33,7 @@
             position: relative;
             flex: 1;
             overflow: hidden;
-            background: transparent; /* Ensure animation background is transparent */
+            background: transparent;
         }
 
         /* Frame styling */
@@ -58,15 +58,15 @@
         /* State list styling */
         .state-list {
             display: flex;
-            flex-direction: column; /* Vertical list */
-            align-items: flex-start; /* Left-align items */
+            flex-direction: column; /* Vertical list for desktop */
+            align-items: flex-start;
             justify-content: center;
-            overflow-y: auto; /* Enable vertical scrolling if needed */
+            overflow-y: auto; /* Enable vertical scrolling */
             overflow-x: hidden;
             width: 15%;
             padding: 10px;
-            padding-bottom: 20px; /* Add bottom padding to the state list */
-            background: transparent; /* Transparent background */
+            padding-bottom: 20px;
+            background: transparent;
         }
 
         .state-item {
@@ -74,21 +74,24 @@
             font-family: 'IBM Plex Mono', monospace;
             font-size: 1rem;
             color: black;
-            opacity: 0.5; /* Inactive state */
+            opacity: 0.5;
             transition: opacity 0.3s ease, transform 0.3s ease;
             cursor: pointer;
         }
 
         .state-item.active {
-            opacity: 1; /* Active state */
+            opacity: 1;
             transform: scale(1.1);
         }
 
-        /* Ensure the state list is visible on smaller screens */
+        /* Mobile adjustments */
         @media (max-width: 768px) {
             .main-container {
-                flex-direction: column; /* Stack vertically */
-                padding-bottom: 0; /* Remove extra padding for mobile */
+                flex-direction: column;
+            }
+
+            .container {
+                height: 80%; /* Adjust animation height for mobile */
             }
 
             .state-list {
@@ -101,12 +104,13 @@
                 order: 2; /* Place below the animation */
                 white-space: nowrap;
                 padding: 10px;
-                padding-bottom: 10px; /* Adjust bottom padding for mobile */
+                padding-bottom: 10px;
             }
 
             .state-item {
                 display: inline-block;
                 margin: 0 10px;
+                font-size: 0.9rem; /* Slightly smaller text for mobile */
             }
         }
     </style>
@@ -162,10 +166,13 @@
                     const img = document.createElement('img');
                     img.src = `sigil_12_06/sig${index}.png`; // Ensure correct image path
                     img.alt = name;
+
+                    // Handle missing images
                     img.onerror = () => {
                         console.error(`Image not found: sigil_12_06/sig${index}.png`);
-                        frame.style.display = 'none'; // Hide frame if image is missing
+                        frame.style.display = 'none';
                     };
+
                     frame.appendChild(img);
                 }
 
