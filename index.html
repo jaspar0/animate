@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Animation with Touch and Scroll Support</title>
+    <title>Responsive Animation</title>
     <style>
         html, body {
             margin: 0;
@@ -13,25 +13,16 @@
             width: 100%;
             background: transparent;
             display: flex;
-            flex-direction: column; /* Stack elements vertically */
+            justify-content: center;
+            align-items: center;
         }
 
         .main-container {
             display: flex;
-            flex-direction: column; /* Stack text and animation vertically */
+            flex-direction: row; /* Desktop layout */
             width: 100%;
             height: 100%;
             background: transparent;
-        }
-
-        .text-block {
-            text-align: center;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.5rem;
-            color: black;
-            padding: 1rem 0;
-            background: transparent;
-            z-index: 10; /* Ensure it stays above the animation */
         }
 
         .container {
@@ -61,7 +52,7 @@
 
         .state-list {
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Vertical for desktop */
             align-items: flex-start;
             justify-content: center;
             overflow-y: auto;
@@ -88,27 +79,22 @@
 
         @media (max-width: 768px) {
             .main-container {
-                flex-direction: column;
-                height: 100vh; /* Ensure everything fits in the viewport */
-            }
-
-            .text-block {
-                font-size: 1.2rem;
-                padding: 0.5rem 0;
+                flex-direction: column; /* Stack for mobile */
+                height: 100vh;
             }
 
             .container {
-                height: 75%; /* Reduce animation height to fit state list */
+                height: 75%; /* Adjust animation height for mobile */
             }
 
             .state-list {
-                flex-direction: row;
+                flex-direction: row; /* Horizontal for mobile */
                 overflow-x: auto;
                 overflow-y: hidden;
                 width: 100%;
                 justify-content: center;
                 align-items: center;
-                order: 2;
+                order: 2; /* Position below animation */
                 white-space: nowrap;
                 padding: 0.5rem 1rem;
             }
@@ -123,7 +109,6 @@
 </head>
 <body>
     <div class="main-container">
-        <div class="text-block">Try Scrolling!</div>
         <div class="state-list"></div>
         <div class="container"></div>
     </div>
@@ -138,9 +123,9 @@
             let touchStartY = 0;
             let touchEndY = 0;
 
-            let scrollThreshold = 100;
+            let scrollThreshold = 100; // Default threshold
             if (window.innerWidth <= 768) {
-                scrollThreshold = 40;
+                scrollThreshold = 40; // Lower threshold for mobile
             }
 
             const frameNames = [
