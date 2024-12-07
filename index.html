@@ -5,20 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Animation with Touch Support</title>
     <style>
-        /* Transparent background */
         html, body {
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Disable default scrolling */
+            overflow: hidden;
             height: 100%;
             width: 100%;
-            background: transparent; /* Fully transparent */
+            background: transparent;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Main container for the animation */
         .main-container {
             display: flex;
             flex-direction: row;
@@ -27,7 +25,6 @@
             background: transparent;
         }
 
-        /* Animation container */
         .container {
             position: relative;
             flex: 1;
@@ -35,7 +32,6 @@
             background: transparent;
         }
 
-        /* Frame styling */
         .frame {
             position: absolute;
             top: 50%;
@@ -54,17 +50,16 @@
             object-fit: contain;
         }
 
-        /* State list styling */
         .state-list {
             display: flex;
-            flex-direction: column; /* Vertical list for desktop */
-            align-items: flex-start; /* Left-align items */
-            justify-content: center; /* Center the list vertically */
-            overflow-y: auto; /* Enable vertical scrolling */
-            overflow-x: hidden; /* Disable horizontal scrolling */
-            width: 15%; /* Set the width of the state list */
-            padding: 0 3rem 3rem; /* Top: 0, Left/Right: 1rem, Bottom: 2rem */
-            background: transparent; /* Transparent background */
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 15%;
+            padding: 0 3rem 2rem;
+            background: transparent;
         }
 
         .state-item {
@@ -82,32 +77,31 @@
             transform: scale(1.1);
         }
 
-        /* Mobile adjustments */
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
             }
 
             .container {
-                height: 80%; /* Adjust animation height for mobile */
+                height: 80%;
             }
 
             .state-list {
-                flex-direction: row; /* Horizontal list */
-                overflow-x: auto; /* Enable horizontal scrolling */
-                overflow-y: hidden; /* Disable vertical scrolling */
-                width: 100%; /* Full width on mobile */
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                width: 100%;
                 justify-content: flex-start;
                 align-items: center;
-                order: 2; /* Place below the animation */
+                order: 2;
                 white-space: nowrap;
-                padding: 0.5rem 0.5rem 1rem; /* Adjusted padding for mobile */
+                padding: 0.5rem 1rem 1rem;
             }
 
             .state-item {
                 display: inline-block;
                 margin: 0 10px;
-                font-size: 0.9rem; /* Slightly smaller text for mobile */
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -123,41 +117,20 @@
             const stateList = document.querySelector('.state-list');
             const frames = [];
             const stateItems = [];
-            const scrollThreshold = 100;
+            const scrollThreshold = 50; // Adjust scroll sensitivity
             let scrollDelta = 0;
             let currentFrameIndex = 0;
-
-            // Variables for touch support
             let touchStartY = 0;
             let touchEndY = 0;
 
-            // Frame names and paths
             const frameNames = [
-                "00_KHAOS",
-                "01_VOID",
-                "02_AETHER",
-                "03_FLARE",
-                "04_FUSION",
-                "05_TERRA",
-                "06_AQUA",
-                "07_PLASMA_LUX",
-                "08_GAIA",
-                "09_ANIMA",
-                "10_ARCHE",
-                "11_MATERIA",
-                "12_PRESENCE",
-                "13_KHAOS_REBORN",
-                "14_DARK_MATTER",
-                "15_ANTIMATTER",
-                "16_SYNTHESIS",
-                "17_GENIUS_LOCI",
-                "18_CHRONOS",
-                "19_ETHOS",
-                "20_UNIVERSE",
-                "21_HARMONY"
+                "00_KHAOS", "01_VOID", "02_AETHER", "03_FLARE", "04_FUSION",
+                "05_TERRA", "06_AQUA", "07_PLASMA_LUX", "08_GAIA", "09_ANIMA",
+                "10_ARCHE", "11_MATERIA", "12_PRESENCE", "13_KHAOS_REBORN",
+                "14_DARK_MATTER", "15_ANTIMATTER", "16_SYNTHESIS", "17_GENIUS_LOCI",
+                "18_CHRONOS", "19_ETHOS", "20_UNIVERSE", "21_HARMONY"
             ];
 
-            // Create frames and state items
             frameNames.forEach((name, index) => {
                 const frame = document.createElement('div');
                 frame.className = 'frame';
@@ -165,7 +138,7 @@
 
                 if (index > 0) {
                     const img = document.createElement('img');
-                    img.src = `sigil_12_06/sig${index}.png`; // Ensure correct image path
+                    img.src = `sigil_12_06/sig${index}.png`;
                     img.alt = name;
 
                     img.onerror = () => {
@@ -191,7 +164,6 @@
                 });
             });
 
-            // Update active frame
             function updateActiveFrame(index) {
                 frames.forEach((frame, i) => {
                     frame.style.opacity = i <= index ? '1' : '0';
@@ -200,34 +172,19 @@
                 stateItems.forEach((item, i) => {
                     item.classList.toggle('active', i === index);
                 });
+
+                const activeItem = stateItems[index];
+                if (activeItem) {
+                    const offset = activeItem.offsetLeft - stateList.offsetWidth / 2 + activeItem.offsetWidth / 2;
+                    if (window.innerWidth <= 768) {
+                        stateList.scrollTo({ left: offset, behavior: 'smooth' });
+                    }
+                }
             }
 
-            // Scroll handler for desktop
-            window.addEventListener('wheel', (event) => {
-                scrollDelta += event.deltaY;
-
-                if (Math.abs(scrollDelta) >= scrollThreshold) {
-                    const direction = scrollDelta > 0 ? 1 : -1;
-                    let newIndex = currentFrameIndex + direction;
-
-                    if (newIndex < 0) newIndex = frames.length - 1;
-                    if (newIndex >= frames.length) newIndex = 0;
-
-                    currentFrameIndex = newIndex;
-                    updateActiveFrame(currentFrameIndex);
-
-                    scrollDelta = 0;
-                }
-                event.preventDefault();
-            });
-
-            // Touch handler for mobile
-            container.addEventListener('touchstart', (event) => {
-                touchStartY = event.touches[0].clientY;
-            });
-
-            container.addEventListener('touchmove', (event) => {
-                touchEndY = event.touches[0].clientY;
+            container.addEventListener('touchstart', (e) => (touchStartY = e.touches[0].clientY));
+            container.addEventListener('touchmove', (e) => {
+                touchEndY = e.touches[0].clientY;
                 const swipeDistance = touchStartY - touchEndY;
 
                 if (Math.abs(swipeDistance) >= scrollThreshold) {
@@ -240,11 +197,11 @@
                     currentFrameIndex = newIndex;
                     updateActiveFrame(currentFrameIndex);
 
-                    touchStartY = touchEndY; // Reset for continuous swiping
+                    touchStartY = touchEndY;
                 }
             });
 
-            updateActiveFrame(0); // Initialize
+            updateActiveFrame(0);
         });
     </script>
 </body>
