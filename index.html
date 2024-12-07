@@ -20,6 +20,7 @@
             width: 100%;
             height: calc(100vh - 50px); /* Deduct height for external content above */
             background: transparent;
+            position: relative;
         }
 
         .container {
@@ -35,10 +36,10 @@
         .frame {
             position: absolute;
             top: 50%;
-            left: 50%; /* Align to horizontal center */
-            transform: translate(-50%, -50%); /* Center to 0,0 of the PNGs */
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 100%;
-            height: auto; /* Maintain aspect ratio */
+            height: auto;
             opacity: 0;
             transition: opacity 0.2s ease-in-out;
         }
@@ -80,19 +81,22 @@
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
-                height: calc(100vh - 50px); /* Adjust height for mobile */
+                height: 100vh; /* Ensure full screen height on mobile */
             }
 
             .state-list {
+                position: absolute;
+                bottom: 0; /* Anchor to the bottom of the screen */
+                left: 0;
+                width: 100%; /* Take full width */
                 flex-direction: row; /* Horizontal layout */
                 overflow-x: auto; /* Horizontal scrolling for state list */
                 overflow-y: hidden;
-                width: 100%;
                 justify-content: center;
                 align-items: center;
-                order: 2; /* Move to bottom of the layout */
                 white-space: nowrap;
                 padding: 0.5rem 1rem;
+                background: rgba(255, 255, 255, 0.9); /* Optional: add a subtle background */
             }
 
             .state-item {
