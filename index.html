@@ -2,11 +2,18 @@
     document.addEventListener("DOMContentLoaded", function () {
         const body = document.querySelector("body");
 
-        // Ensure we only apply scrolling restrictions on the animation page
+        // Check if we are on the animation page
         if (body.classList.contains("animation-page")) {
+            console.log("Initializing animation page...");
+
             const container = document.querySelector('.container');
-            const iframe = document.querySelector("iframe");
             const stateList = document.querySelector('.state-list');
+
+            if (!container || !stateList) {
+                console.error("Required elements (.container, .state-list) are missing.");
+                return;
+            }
+
             const frames = [];
             const stateItems = [];
             const scrollThreshold = 100; // Sensitivity for scroll progression
@@ -41,6 +48,8 @@
 
             // Create frames and state items
             frameNames.forEach((name, index) => {
+                console.log(`Creating frame: ${name} (Index: ${index})`);
+
                 const frame = document.createElement('div');
                 frame.className = 'frame';
                 frame.style.zIndex = frameNames.length - index;
@@ -75,6 +84,7 @@
 
             // Update active frame
             function updateActiveFrame(index) {
+                console.log(`Updating to frame index: ${index}`);
                 frames.forEach((frame, i) => {
                     frame.style.opacity = i <= index ? '1' : '0';
                 });
@@ -108,14 +118,8 @@
             });
 
             updateActiveFrame(0); // Initialize
-        }
-
-        // Allow normal scrolling behavior on other pages
-        else {
-            window.addEventListener("wheel", (event) => {
-                // Ensure normal behavior
-                event.stopImmediatePropagation();
-            });
+        } else {
+            console.log("Not an animation page. Skipping animation setup.");
         }
     });
 </script>
