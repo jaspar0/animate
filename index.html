@@ -53,13 +53,14 @@
             object-fit: contain; /* Maintain aspect ratio */
         }
 
-        /* State list (desktop: vertical on the left) */
+        /* State list (desktop: vertical on the left, centered horizontally) */
         .state-list {
             display: flex;
             flex-direction: column; /* Vertical layout */
-            align-items: flex-start; /* Left-align items */
-            justify-content: flex-start;
+            align-items: center; /* Center items horizontally */
+            justify-content: center; /* Center items vertically */
             overflow-y: auto; /* Enable scrolling for long lists */
+            overflow-x: hidden;
             width: 15%; /* Fixed width for the state list */
             padding: 10px;
             background: transparent; /* No background or shadow */
@@ -82,7 +83,7 @@
             transform: scale(1.1);
         }
 
-        /* Horizontal list for mobile */
+        /* Horizontal list for mobile (placed at the bottom) */
         @media (max-width: 900px) {
             .main-container {
                 flex-direction: column; /* Stack vertically on mobile */
@@ -101,6 +102,7 @@
                 width: 100%;
                 padding: 10px;
                 white-space: nowrap;
+                order: 1; /* Place the state list below the animation */
             }
 
             .state-item {
