@@ -23,6 +23,23 @@
             position: relative;
         }
 
+        .state-list {
+            display: flex;
+            flex-direction: column; /* Vertical list for desktop */
+            align-items: flex-start; /* Align items to the left */
+            justify-content: flex-start; /* Align vertically to the top */
+            overflow-y: auto; /* Enable vertical scrolling */
+            overflow-x: hidden;
+            width: 15%;
+            padding: 1rem 3rem 2rem;
+            background: transparent;
+        }
+
+        /* Adjust the position of the state list */
+        .state-list {
+            order: 0; /* Ensure it stays on the left */
+        }
+
         .container {
             position: relative;
             flex: 1;
@@ -51,18 +68,6 @@
             object-fit: contain;
         }
 
-        .state-list {
-            display: flex;
-            flex-direction: column; /* Vertical list for desktop */
-            align-items: flex-start; /* Align items to the left */
-            justify-content: center; /* Vertically center items */
-            overflow-y: auto; /* Enable vertical scrolling */
-            overflow-x: hidden;
-            width: 15%;
-            padding: 1rem 3rem 2rem;
-            background: transparent;
-        }
-
         .state-item {
             margin: 5px 0;
             font-family: 'IBM Plex Mono', monospace;
@@ -86,7 +91,6 @@
 
             .state-list {
                 position: relative; /* Position relative instead of absolute */
-                bottom: auto; /* Remove bottom anchoring */
                 margin-top: 1rem; /* Add spacing below the animation */
                 width: 100%; /* Take full width */
                 flex-direction: row; /* Horizontal layout */
@@ -109,8 +113,8 @@
 </head>
 <body>
     <div class="main-container">
-        <div class="container"></div>
         <div class="state-list"></div>
+        <div class="container"></div>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
