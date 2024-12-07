@@ -87,20 +87,23 @@
         /* Ensure the state list is visible on smaller screens */
         @media (max-width: 768px) {
             .main-container {
-                flex-direction: column;
+                flex-direction: column; /* Stack vertically */
+                padding-bottom: 0; /* Remove extra padding for mobile */
             }
-
+    
             .state-list {
-                flex-direction: row;
-                overflow-x: auto;
+                flex-direction: row; /* Horizontal list */
+                overflow-x: auto; /* Enable horizontal scrolling */
                 overflow-y: hidden;
                 width: 100%;
                 justify-content: flex-start;
                 align-items: center;
-                order: 2; /* Place it below the animation */
+                order: 2; /* Place below the animation */
                 white-space: nowrap;
+                padding: 10px;
+                padding-bottom: 10px; /* Adjust bottom padding for mobile */
             }
-
+    
             .state-item {
                 display: inline-block;
                 margin: 0 10px;
