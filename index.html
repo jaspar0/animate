@@ -117,11 +117,16 @@
             const stateList = document.querySelector('.state-list');
             const frames = [];
             const stateItems = [];
-            const scrollThreshold = 50; // Adjust scroll sensitivity
             let scrollDelta = 0;
             let currentFrameIndex = 0;
             let touchStartY = 0;
             let touchEndY = 0;
+
+            // Set scrollThreshold based on device type
+            let scrollThreshold = 100; // Default for desktop
+            if (window.innerWidth <= 768) {
+                scrollThreshold = 40; // Lower threshold for mobile
+            }
 
             const frameNames = [
                 "00_KHAOS", "01_VOID", "02_AETHER", "03_FLARE", "04_FUSION",
