@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Animation with Touch Support</title>
+    <title>Responsive Animation with Touch and Scroll Support</title>
     <style>
         html, body {
             margin: 0;
@@ -122,10 +122,9 @@
             let touchStartY = 0;
             let touchEndY = 0;
 
-            // Set scrollThreshold based on device type
-            let scrollThreshold = 100; // Default for desktop
+            let scrollThreshold = 100;
             if (window.innerWidth <= 768) {
-                scrollThreshold = 40; // Lower threshold for mobile
+                scrollThreshold = 40;
             }
 
             const frameNames = [
@@ -205,6 +204,24 @@
                     touchStartY = touchEndY;
                 }
             });
+
+            window.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                scrollDelta += event.deltaY;
+
+                if (Math.abs(scrollDelta) >= scrollThreshold) {
+                    const direction = scrollDelta > 0 ? 1 : -1;
+                    let newIndex = currentFrameIndex + direction;
+
+                    if (newIndex < 0) newIndex = frames.length - 1;
+                    if (newIndex >= frames.length) newIndex = 0;
+
+                    currentFrameIndex = newIndex;
+                    updateActiveFrame(currentFrameIndex);
+
+                    scrollDelta = 0;
+                }
+            }, { passive: false });
 
             updateActiveFrame(0);
         });
