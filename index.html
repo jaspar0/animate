@@ -1,26 +1,103 @@
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const body = document.querySelector("body");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation</title>
+    <style>
+        /* Prevent scrolling and ensure a centered layout */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Disable default scrolling */
+            height: 100%;
+            width: 100%;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-        // Check if we are on the animation page
-        if (body.classList.contains("animation-page")) {
-            console.log("Initializing animation page...");
+        /* Main container for the animation */
+        .main-container {
+            display: flex;
+            flex-direction: row;
+            width: 90%;
+            height: 90%;
+        }
 
+        /* Animation container */
+        .container {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            background: #ffffff; /* Optional: match the background */
+        }
+
+        /* Center each frame absolutely */
+        .frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .frame img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Vertical state list */
+        .state-list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 15%;
+            padding: 10px;
+        }
+
+        /* State item styling */
+        .state-item {
+            margin: 5px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            color: black;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .state-item.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="state-list"></div>
+        <div class="container"></div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
             const container = document.querySelector('.container');
             const stateList = document.querySelector('.state-list');
-
-            if (!container || !stateList) {
-                console.error("Required elements (.container, .state-list) are missing.");
-                return;
-            }
-
             const frames = [];
             const stateItems = [];
-            const scrollThreshold = 100; // Sensitivity for scroll progression
-            let scrollDelta = 0; // Accumulated scroll value
-            let currentFrameIndex = 0; // Start at Frame 0
+            const scrollThreshold = 100;
+            let scrollDelta = 0;
+            let currentFrameIndex = 0;
 
-            // Define custom names for the frames (including Frame 0)
+            // Frame names and paths
             const frameNames = [
                 "00_KHAOS",
                 "01_VOID",
@@ -48,34 +125,29 @@
 
             // Create frames and state items
             frameNames.forEach((name, index) => {
-                console.log(`Creating frame: ${name} (Index: ${index})`);
-
+                // Frame creation
                 const frame = document.createElement('div');
                 frame.className = 'frame';
                 frame.style.zIndex = frameNames.length - index;
 
                 if (index > 0) {
                     const img = document.createElement('img');
-                    img.src = `sigil_12_06/sig${index}.png`;
+                    img.src = `sigil_12_06/sig${index}.png`; // Update to your correct image path
                     img.alt = name;
-                    img.onerror = () => {
-                        console.error(`Image not found: sigil_12_06/sig${index}.png`);
-                        frame.style.display = 'none'; // Hide frame if image is missing
-                    };
                     frame.appendChild(img);
                 }
 
                 container.appendChild(frame);
                 frames.push(frame);
 
-                // Create state item
+                // State list item creation
                 const stateItem = document.createElement('div');
                 stateItem.className = 'state-item';
                 stateItem.textContent = name;
                 stateList.appendChild(stateItem);
                 stateItems.push(stateItem);
 
-                // Click handler
+                // Click handler for state items
                 stateItem.addEventListener('click', () => {
                     currentFrameIndex = index;
                     updateActiveFrame(index);
@@ -84,7 +156,6 @@
 
             // Update active frame
             function updateActiveFrame(index) {
-                console.log(`Updating to frame index: ${index}`);
                 frames.forEach((frame, i) => {
                     frame.style.opacity = i <= index ? '1' : '0';
                 });
@@ -94,32 +165,27 @@
                 });
             }
 
-            // Scroll handling for animation page
-            window.addEventListener("wheel", (event) => {
-                event.preventDefault(); // Prevent default scrolling behavior
+            // Scroll handler
+            window.addEventListener('wheel', (event) => {
                 scrollDelta += event.deltaY;
 
                 if (Math.abs(scrollDelta) >= scrollThreshold) {
                     const direction = scrollDelta > 0 ? 1 : -1;
-                    let newFrameIndex = currentFrameIndex + direction;
+                    let newIndex = currentFrameIndex + direction;
 
-                    // Infinite scrolling logic
-                    if (newFrameIndex > frames.length - 1) {
-                        newFrameIndex = 0;
-                    } else if (newFrameIndex < 0) {
-                        newFrameIndex = frames.length - 1;
-                    }
+                    if (newIndex < 0) newIndex = frames.length - 1;
+                    if (newIndex >= frames.length) newIndex = 0;
 
-                    currentFrameIndex = newFrameIndex;
-                    updateActiveFrame(newFrameIndex);
+                    currentFrameIndex = newIndex;
+                    updateActiveFrame(currentFrameIndex);
 
                     scrollDelta = 0;
                 }
+                event.preventDefault();
             });
 
             updateActiveFrame(0); // Initialize
-        } else {
-            console.log("Not an animation page. Skipping animation setup.");
-        }
-    });
-</script>
+        });
+    </script>
+</body>
+</html>
