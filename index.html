@@ -3,28 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centered Animation</title>
+    <title>Aligned Animation</title>
     <style>
-        /* Reset styles and lock the body */
         html, body {
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevent page scrolling */
+            overflow: hidden;
             height: 100%;
             width: 100%;
             background: transparent;
         }
 
-        /* Main container setup */
         .main-container {
             display: flex;
             flex-direction: row; /* Horizontal layout for desktop */
             width: 100%;
-            height: calc(100vh - 50px); /* Deduct height for any external content above */
+            height: calc(100vh - 50px); /* Deduct height for external content above */
             background: transparent;
         }
 
-        /* State list styling */
+        .container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .frame {
+            position: absolute;
+            top: 50%;
+            left: 50%; /* Align to horizontal center */
+            transform: translate(-50%, -50%); /* Center to 0,0 of the PNGs */
+            width: 100%;
+            height: auto; /* Maintain aspect ratio */
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .frame img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
         .state-list {
             display: flex;
             flex-direction: column; /* Vertical list for desktop */
@@ -33,7 +58,7 @@
             overflow-y: auto; /* Enable vertical scrolling */
             overflow-x: hidden;
             width: 15%;
-            padding: 0 3rem 2rem;
+            padding: 1rem 3rem 2rem;
             background: transparent;
         }
 
@@ -52,48 +77,22 @@
             transform: scale(1.1);
         }
 
-        /* Animation container */
-        .container {
-            position: relative;
-            flex: 1; /* Allow it to take the remaining space */
-            display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            overflow: hidden;
-            background: transparent;
-        }
-
-        .frame {
-            position: absolute;
-            width: 100%; /* Responsive width */
-            max-width: 80%; /* Optional max width for very large screens */
-            height: auto; /* Maintain aspect ratio */
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-        }
-
-        .frame img {
-            display: block;
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-        }
-
-        /* Mobile responsiveness */
         @media (max-width: 768px) {
             .main-container {
-                flex-direction: column; /* Stack vertically */
+                flex-direction: column;
                 height: calc(100vh - 50px); /* Adjust height for mobile */
             }
 
             .state-list {
-                flex-direction: row; /* Horizontal layout for mobile */
+                flex-direction: row; /* Horizontal layout */
                 overflow-x: auto; /* Horizontal scrolling for state list */
                 overflow-y: hidden;
                 width: 100%;
                 justify-content: center;
                 align-items: center;
-                padding: 0.5rem;
+                order: 2; /* Move to bottom of the layout */
+                white-space: nowrap;
+                padding: 0.5rem 1rem;
             }
 
             .state-item {
