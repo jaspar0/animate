@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animation</title>
+    <title>Animation with State List</title>
     <style>
         /* Transparent background */
         html, body {
@@ -53,16 +53,70 @@
             height: 100%;
             object-fit: contain;
         }
+
+        /* State list styling */
+        .state-list {
+            display: flex;
+            flex-direction: column; /* Vertical list */
+            align-items: flex-start; /* Left-align items */
+            justify-content: center;
+            overflow-y: auto; /* Enable vertical scrolling if needed */
+            overflow-x: hidden;
+            width: 15%; /* Fixed width for state list */
+            padding: 10px;
+            background: transparent; /* Transparent background */
+        }
+
+        .state-item {
+            margin: 5px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            color: black;
+            opacity: 0.5; /* Inactive state */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .state-item.active {
+            opacity: 1; /* Active state */
+            transform: scale(1.1);
+        }
+
+        /* Ensure the state list is visible on smaller screens */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .state-list {
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                width: 100%;
+                justify-content: flex-start;
+                align-items: center;
+                order: 2; /* Place it below the animation */
+                white-space: nowrap;
+            }
+
+            .state-item {
+                display: inline-block;
+                margin: 0 10px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="main-container">
+        <div class="state-list"></div>
         <div class="container"></div>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const container = document.querySelector('.container');
+            const stateList = document.querySelector('.state-list');
             const frames = [];
+            const stateItems = [];
             const scrollThreshold = 100;
             let scrollDelta = 0;
             let currentFrameIndex = 0;
@@ -93,8 +147,9 @@
                 "21_HARMONY"
             ];
 
-            // Create frames
+            // Create frames and state items
             frameNames.forEach((name, index) => {
+                // Create frame
                 const frame = document.createElement('div');
                 frame.className = 'frame';
                 frame.style.zIndex = frameNames.length - index;
@@ -115,12 +170,29 @@
 
                 container.appendChild(frame);
                 frames.push(frame);
+
+                // Create state item
+                const stateItem = document.createElement('div');
+                stateItem.className = 'state-item';
+                stateItem.textContent = name;
+                stateList.appendChild(stateItem);
+                stateItems.push(stateItem);
+
+                // Click handler for state items
+                stateItem.addEventListener('click', () => {
+                    currentFrameIndex = index;
+                    updateActiveFrame(index);
+                });
             });
 
             // Update active frame
             function updateActiveFrame(index) {
                 frames.forEach((frame, i) => {
                     frame.style.opacity = i <= index ? '1' : '0';
+                });
+
+                stateItems.forEach((item, i) => {
+                    item.classList.toggle('active', i === index);
                 });
             }
 
