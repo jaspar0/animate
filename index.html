@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aligned Animation</title>
+    <title>Responsive Animation</title>
     <style>
         html, body {
             margin: 0;
@@ -18,7 +18,7 @@
             display: flex;
             flex-direction: row; /* Horizontal layout for desktop */
             width: 100%;
-            height: calc(100vh - 50px); /* Deduct height for external content above */
+            height: 100%; /* Full viewport height */
             background: transparent;
             position: relative;
         }
@@ -39,7 +39,8 @@
             left: 50%;
             transform: translate(-50%, -50%);
             width: 100%;
-            height: auto;
+            height: auto; /* Adjust based on aspect ratio */
+            max-height: 90%; /* Prevent overflowing beyond the viewport */
             opacity: 0;
             transition: opacity 0.2s ease-in-out;
         }
@@ -47,7 +48,7 @@
         .frame img {
             display: block;
             width: 100%;
-            height: auto;
+            height: auto; /* Maintain aspect ratio */
             object-fit: contain;
         }
 
@@ -81,14 +82,18 @@
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
-                height: 100vh; /* Ensure full screen height on mobile */
+                height: 100vh; /* Full screen height for mobile */
+            }
+
+            .container {
+                height: 75%; /* Adjust container height for mobile */
             }
 
             .state-list {
                 position: absolute;
                 bottom: 0; /* Anchor to the bottom of the screen */
                 left: 0;
-                width: 100%; /* Take full width */
+                width: 100%; /* Full width */
                 flex-direction: row; /* Horizontal layout */
                 overflow-x: auto; /* Horizontal scrolling for state list */
                 overflow-y: hidden;
@@ -96,7 +101,7 @@
                 align-items: center;
                 white-space: nowrap;
                 padding: 0.5rem 1rem;
-                background: rgba(255, 255, 255, 0.9); /* Optional: add a subtle background */
+                background: rgba(255, 255, 255, 0.9); /* Optional background */
             }
 
             .state-item {
