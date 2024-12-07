@@ -90,7 +90,7 @@
                 flex-direction: column; /* Stack vertically */
                 padding-bottom: 0; /* Remove extra padding for mobile */
             }
-    
+
             .state-list {
                 flex-direction: row; /* Horizontal list */
                 overflow-x: auto; /* Enable horizontal scrolling */
@@ -103,7 +103,7 @@
                 padding: 10px;
                 padding-bottom: 10px; /* Adjust bottom padding for mobile */
             }
-    
+
             .state-item {
                 display: inline-block;
                 margin: 0 10px;
@@ -154,7 +154,6 @@
 
             // Create frames and state items
             frameNames.forEach((name, index) => {
-                // Create frame
                 const frame = document.createElement('div');
                 frame.className = 'frame';
                 frame.style.zIndex = frameNames.length - index;
@@ -163,13 +162,10 @@
                     const img = document.createElement('img');
                     img.src = `sigil_12_06/sig${index}.png`; // Ensure correct image path
                     img.alt = name;
-
-                    // Handle missing images
                     img.onerror = () => {
                         console.error(`Image not found: sigil_12_06/sig${index}.png`);
                         frame.style.display = 'none'; // Hide frame if image is missing
                     };
-
                     frame.appendChild(img);
                 }
 
