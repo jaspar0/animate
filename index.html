@@ -84,7 +84,7 @@
             }
 
             .container {
-                height: 70%; /* Reduced height for better vertical spacing */
+                height: 75%; /* Reduced height to make room for the state list */
             }
 
             .state-list {
@@ -92,11 +92,11 @@
                 overflow-x: auto;
                 overflow-y: hidden;
                 width: 100%;
-                justify-content: flex-start;
+                justify-content: center; /* Center-align the state list below the animation */
                 align-items: center;
-                order: 2;
+                order: 2; /* Ensure it comes after the animation */
                 white-space: nowrap;
-                padding: 0.5rem 1rem 1rem; /* Adjusted padding for mobile */
+                padding: 1rem 1rem 0.5rem; /* Adjusted padding to move it closer to the animation */
             }
 
             .state-item {
