@@ -10,6 +10,7 @@
             height: 100%;
             width: 100%;
             background: transparent; /* Transparent background */
+            overscroll-behavior: none; /* Prevent overscroll on touch devices */
         }
 
         body {
@@ -53,12 +54,12 @@
             object-fit: contain; /* Maintain aspect ratio */
         }
 
-        /* State list (desktop: vertical on the left, centered horizontally) */
+        /* State list (desktop: vertical on the left, left-aligned) */
         .state-list {
             display: flex;
             flex-direction: column; /* Vertical layout */
             align-items: flex-start; /* Left-align items */
-            justify-content: center; /* Center items vertically */
+            justify-content: center; /* Vertically center items */
             overflow-y: auto; /* Enable scrolling for long lists */
             overflow-x: hidden;
             width: 15%; /* Fixed width for the state list */
@@ -198,22 +199,11 @@
             stateItems.forEach((item, i) => {
                 item.classList.toggle('active', i === index);
             });
-
-            // Sync horizontal scroll position (mobile)
-            if (window.innerWidth <= 900) {
-                const activeItem = stateItems[index];
-                if (activeItem) {
-                    const offset = activeItem.offsetLeft + activeItem.offsetWidth / 2 - window.innerWidth / 2;
-                    stateList.scrollTo({
-                        left: offset,
-                        behavior: 'smooth'
-                    });
-                }
-            }
         }
 
         // Scroll handling
-        window.addEventListener('wheel', (event) => {
+        window.addEventListener("wheel", (event) => {
+            event.preventDefault(); // Prevent default scrolling behavior
             scrollDelta += event.deltaY;
 
             if (Math.abs(scrollDelta) >= scrollThreshold) {
