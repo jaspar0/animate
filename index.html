@@ -103,6 +103,13 @@
                     const img = document.createElement('img');
                     img.src = `sigil_12_06/sig${index}.png`; // Ensure correct image path
                     img.alt = name;
+
+                    // Handle missing images
+                    img.onerror = () => {
+                        console.error(`Image not found: sigil_12_06/sig${index}.png`);
+                        frame.style.display = 'none'; // Hide frame if image is missing
+                    };
+
                     frame.appendChild(img);
                 }
 
