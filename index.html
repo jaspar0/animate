@@ -5,56 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Aligned Animation</title>
     <style>
-        body {
+        html, body {
             margin: 0;
             padding: 0;
             overflow: hidden;
+            height: 100%;
+            width: 100%;
             background: transparent;
             touch-action: none;
         }
 
         .main-container {
-            position: fixed;
-            width: 100vw;
-            height: 100vh;
             display: flex;
             flex-direction: row;
+            width: 100%;
+            height: calc(100vh - 50px);
+            background: transparent;
+            position: relative;
         }
 
         .state-list {
-            width: 15%;
-            padding: 1rem 3rem;
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 15%;
+            padding: 1rem 3rem;
+            background: transparent;
         }
 
         .container {
+            position: relative;
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
+            background: transparent;
             max-width: 80%;
             margin: 0 auto;
         }
 
         .frame {
             position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 80%;
+            height: auto;
             opacity: 0;
+            transition: opacity 0.2s ease-in-out;
         }
 
         .frame img {
-            width: 100%;
+            display: block;
+            width: 80%;
             height: auto;
+            object-fit: contain;
+            margin: 0 auto;
             pointer-events: none;
         }
 
         .state-item {
             margin: 5px 0;
-            font-family: monospace;
+            font-family: 'IBM Plex Mono', monospace;
             font-size: 1rem;
+            color: black;
             opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
             cursor: pointer;
         }
 
@@ -66,20 +86,27 @@
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
+                height: 100vh;
             }
 
             .state-list {
+                position: relative;
+                margin-top: 1rem;
                 width: 100%;
-                height: auto;
                 flex-direction: row;
                 overflow-x: auto;
-                padding: 0.5rem;
+                overflow-y: hidden;
+                justify-content: center;
+                align-items: center;
                 white-space: nowrap;
+                padding: 0.5rem 1rem;
+                background: rgba(255, 255, 255, 0.9);
             }
 
             .state-item {
                 display: inline-block;
                 margin: 0 10px;
+                font-size: 0.9rem;
             }
 
             .container {
