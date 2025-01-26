@@ -85,7 +85,7 @@
         
         @media (max-width: 768px) {
             .main-container {
-                flex-direction: column;
+                flex-direction: column-reverse;
                 height: 100vh;
                 position: fixed;
                 width: 100vw;
@@ -93,8 +93,10 @@
             }
         
             .state-list {
-                position: relative;
-                margin-top: 1rem;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                margin-top: 0;
                 width: 100%;
                 flex-direction: row;
                 overflow-x: auto;
