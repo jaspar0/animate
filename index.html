@@ -3,129 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Aligned Animation</title>
     <style>
-        html, body {
+        body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            height: 100%;
-            width: 100%;
             background: transparent;
-            position: fixed;
+            touch-action: none;
         }
 
         .main-container {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             flex-direction: row;
-            width: 100%;
-            height: calc(100vh - 50px);
-            background: transparent;
-            position: relative;
         }
 
         .state-list {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: center;
-            overflow-y: auto;
-            overflow-x: hidden;
             width: 15%;
             padding: 1rem 3rem;
-            background: transparent;
-            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
-            position: relative;
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            background: transparent;
             max-width: 80%;
             margin: 0 auto;
-            touch-action: none;
         }
 
         .frame {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             width: 80%;
-            height: auto;
             opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-            -webkit-transform: translate(-50%, -50%);
-            -webkit-transition: opacity 0.2s ease-in-out;
         }
 
         .frame img {
-            display: block;
-            width: 80%;
+            width: 100%;
             height: auto;
-            object-fit: contain;
-            margin: 0 auto;
-            -webkit-user-drag: none;
-            user-select: none;
+            pointer-events: none;
         }
 
         .state-item {
             margin: 5px 0;
-            font-family: 'IBM Plex Mono', monospace;
+            font-family: monospace;
             font-size: 1rem;
-            color: black;
             opacity: 0.5;
-            transition: opacity 0.3s ease, transform 0.3s ease;
             cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .state-item.active {
             opacity: 1;
             transform: scale(1.1);
-            -webkit-transform: scale(1.1);
         }
 
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
-                height: 100vh;
-                overflow: hidden;
             }
 
             .state-list {
-                position: relative;
-                margin-top: 1rem;
                 width: 100%;
+                height: auto;
                 flex-direction: row;
                 overflow-x: auto;
-                overflow-y: hidden;
-                justify-content: center;
-                align-items: center;
+                padding: 0.5rem;
                 white-space: nowrap;
-                padding: 0.5rem 1rem;
-                background: rgba(255, 255, 255, 0.9);
             }
 
             .state-item {
                 display: inline-block;
                 margin: 0 10px;
-                font-size: 0.9rem;
             }
 
             .container {
                 max-width: 100%;
-                height: 70vh;
-            }
-
-            .frame img {
-                width: 100%;
-                max-height: 70vh;
+                height: 80vh;
             }
         }
     </style>
@@ -136,119 +95,71 @@
         <div class="container"></div>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const container = document.querySelector('.container');
-            const stateList = document.querySelector('.state-list');
-            const frames = [];
-            const stateItems = [];
-            let scrollDelta = 0;
-            let currentFrameIndex = 0;
-            let touchStartY = 0;
-            let touchEndY = 0;
+        const container = document.querySelector('.container');
+        const stateList = document.querySelector('.state-list');
+        const frames = [];
+        const stateItems = [];
+        let currentFrame = 0;
 
-            let scrollThreshold = window.innerWidth <= 768 ? 40 : 100;
+        const frameNames = [
+            "00_KHAOS", "01_VOID", "02_AETHER", "03_FLARE", "04_FUSION",
+            "05_TERRA", "06_AQUA", "07_PLASMA_LUX", "08_GAIA", "09_ANIMA",
+            "10_ARCHE", "11_MATERIA", "12_PRESENCE", "13_KHAOS_REBORN",
+            "14_DARK_MATTER", "15_ANTIMATTER", "16_SYNTHESIS", "17_GENIUS_LOCI",
+            "18_CHRONOS", "19_ETHOS", "20_UNIVERSE", "21_HARMONY"
+        ];
 
-            const frameNames = [
-                "00_KHAOS", "01_VOID", "02_AETHER", "03_FLARE", "04_FUSION",
-                "05_TERRA", "06_AQUA", "07_PLASMA_LUX", "08_GAIA", "09_ANIMA",
-                "10_ARCHE", "11_MATERIA", "12_PRESENCE", "13_KHAOS_REBORN",
-                "14_DARK_MATTER", "15_ANTIMATTER", "16_SYNTHESIS", "17_GENIUS_LOCI",
-                "18_CHRONOS", "19_ETHOS", "20_UNIVERSE", "21_HARMONY"
-            ];
-
-            frameNames.forEach((name, index) => {
-                const frame = document.createElement('div');
-                frame.className = 'frame';
-
-                if (index > 0) {
-                    const img = document.createElement('img');
-                    img.src = `sigil_12_06/sig${index}.png`;
-                    img.alt = name;
-                    img.draggable = false;
-
-                    img.onerror = () => {
-                        console.error(`Image not found: sigil_12_06/sig${index}.png`);
-                        frame.style.display = 'none';
-                    };
-
-                    frame.appendChild(img);
-                }
-
-                container.appendChild(frame);
-                frames.push(frame);
-
-                const stateItem = document.createElement('div');
-                stateItem.className = 'state-item';
-                stateItem.textContent = name;
-                stateList.appendChild(stateItem);
-                stateItems.push(stateItem);
-
-                stateItem.addEventListener('click', () => {
-                    currentFrameIndex = index;
-                    updateActiveFrame(index);
-                });
-            });
-
-            function updateActiveFrame(index) {
-                frames.forEach((frame, i) => {
-                    frame.style.opacity = i <= index ? '1' : '0';
-                });
-
-                stateItems.forEach((item, i) => {
-                    item.classList.toggle('active', i === index);
-                });
-
-                const activeItem = stateItems[index];
-                if (activeItem && window.innerWidth <= 768) {
-                    const offset = activeItem.offsetLeft - stateList.offsetWidth / 2 + activeItem.offsetWidth / 2;
-                    stateList.scrollTo({ left: offset, behavior: 'smooth' });
-                }
+        frameNames.forEach((name, i) => {
+            const frame = document.createElement('div');
+            frame.className = 'frame';
+            
+            if (i > 0) {
+                frame.innerHTML = `<img src="sigil_12_06/sig${i}.png" alt="${name}">`;
             }
+            container.appendChild(frame);
+            frames.push(frame);
 
-            container.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                touchStartY = e.touches[0].clientY;
-            }, { passive: false });
-
-            container.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                touchEndY = e.touches[0].clientY;
-                const swipeDistance = touchStartY - touchEndY;
-
-                if (Math.abs(swipeDistance) >= scrollThreshold) {
-                    const direction = swipeDistance > 0 ? 1 : -1;
-                    let newIndex = currentFrameIndex + direction;
-
-                    if (newIndex < 0) newIndex = frames.length - 1;
-                    if (newIndex >= frames.length) newIndex = 0;
-
-                    currentFrameIndex = newIndex;
-                    updateActiveFrame(currentFrameIndex);
-
-                    touchStartY = touchEndY;
-                }
-            }, { passive: false });
-
-            window.addEventListener('wheel', (event) => {
-                event.preventDefault();
-                scrollDelta += event.deltaY;
-
-                if (Math.abs(scrollDelta) >= scrollThreshold) {
-                    const direction = scrollDelta > 0 ? 1 : -1;
-                    let newIndex = currentFrameIndex + direction;
-
-                    if (newIndex < 0) newIndex = frames.length - 1;
-                    if (newIndex >= frames.length) newIndex = 0;
-
-                    currentFrameIndex = newIndex;
-                    updateActiveFrame(currentFrameIndex);
-
-                    scrollDelta = 0;
-                }
-            }, { passive: false });
-
-            updateActiveFrame(0);
+            const item = document.createElement('div');
+            item.className = 'state-item';
+            item.textContent = name;
+            item.onclick = () => updateFrame(i);
+            stateList.appendChild(item);
+            stateItems.push(item);
         });
+
+        function updateFrame(index) {
+            frames.forEach((frame, i) => frame.style.opacity = i <= index ? '1' : '0');
+            stateItems.forEach((item, i) => item.classList.toggle('active', i === index));
+            currentFrame = index;
+        }
+
+        let touchStart = null;
+        
+        document.addEventListener('touchstart', e => {
+            touchStart = e.touches[0].clientY;
+        }, {passive: false});
+
+        document.addEventListener('touchmove', e => {
+            if (!touchStart) return;
+            
+            const diff = touchStart - e.touches[0].clientY;
+            if (Math.abs(diff) > 30) {
+                const newIndex = currentFrame + (diff > 0 ? 1 : -1);
+                if (newIndex >= 0 && newIndex < frames.length) {
+                    updateFrame(newIndex);
+                }
+                touchStart = e.touches[0].clientY;
+            }
+        }, {passive: false});
+
+        document.addEventListener('wheel', e => {
+            const newIndex = currentFrame + (e.deltaY > 0 ? 1 : -1);
+            if (newIndex >= 0 && newIndex < frames.length) {
+                updateFrame(newIndex);
+            }
+        }, {passive: false});
+
+        updateFrame(0);
     </script>
 </body>
 </html>
