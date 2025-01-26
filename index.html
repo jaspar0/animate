@@ -108,11 +108,6 @@
                 margin: 0 10px;
                 font-size: 0.9rem;
             }
-
-            .container {
-                max-width: 100%;
-                height: 80vh;
-            }
         }
     </style>
 </head>
@@ -122,71 +117,123 @@
         <div class="container"></div>
     </div>
     <script>
-        const container = document.querySelector('.container');
-        const stateList = document.querySelector('.state-list');
-        const frames = [];
-        const stateItems = [];
-        let currentFrame = 0;
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.querySelector('.container');
+            const stateList = document.querySelector('.state-list');
+            const frames = [];
+            const stateItems = [];
+            let scrollDelta = 0;
+            let currentFrameIndex = 0;
+            let touchStartY = 0;
+            let touchEndY = 0;
 
-        const frameNames = [
-            "00_KHAOS", "01_VOID", "02_AETHER", "03_FLARE", "04_FUSION",
-            "05_TERRA", "06_AQUA", "07_PLASMA_LUX", "08_GAIA", "09_ANIMA",
-            "10_ARCHE", "11_MATERIA", "12_PRESENCE", "13_KHAOS_REBORN",
-            "14_DARK_MATTER", "15_ANTIMATTER", "16_SYNTHESIS", "17_GENIUS_LOCI",
-            "18_CHRONOS", "19_ETHOS", "20_UNIVERSE", "21_HARMONY"
-        ];
-
-        frameNames.forEach((name, i) => {
-            const frame = document.createElement('div');
-            frame.className = 'frame';
-            
-            if (i > 0) {
-                frame.innerHTML = `<img src="sigil_12_06/sig${i}.png" alt="${name}">`;
+            let scrollThreshold = 100;
+            if (window.innerWidth <= 768) {
+                scrollThreshold = 40;
             }
-            container.appendChild(frame);
-            frames.push(frame);
 
-            const item = document.createElement('div');
-            item.className = 'state-item';
-            item.textContent = name;
-            item.onclick = () => updateFrame(i);
-            stateList.appendChild(item);
-            stateItems.push(item);
-        });
+            const frameNames = [
+                "00_KHAOS", "01_VOID", "02_AETHER", "03_FLARE", "04_FUSION",
+                "05_TERRA", "06_AQUA", "07_PLASMA_LUX", "08_GAIA", "09_ANIMA",
+                "10_ARCHE", "11_MATERIA", "12_PRESENCE", "13_KHAOS_REBORN",
+                "14_DARK_MATTER", "15_ANTIMATTER", "16_SYNTHESIS", "17_GENIUS_LOCI",
+                "18_CHRONOS", "19_ETHOS", "20_UNIVERSE", "21_HARMONY"
+            ];
 
-        function updateFrame(index) {
-            frames.forEach((frame, i) => frame.style.opacity = i <= index ? '1' : '0');
-            stateItems.forEach((item, i) => item.classList.toggle('active', i === index));
-            currentFrame = index;
-        }
+            frameNames.forEach((name, index) => {
+                const frame = document.createElement('div');
+                frame.className = 'frame';
 
-        let touchStart = null;
-        
-        document.addEventListener('touchstart', e => {
-            touchStart = e.touches[0].clientY;
-        }, {passive: false});
+                if (index > 0) {
+                    const img = document.createElement('img');
+                    img.src = `sigil_12_06/sig${index}.png`;
+                    img.alt = name;
 
-        document.addEventListener('touchmove', e => {
-            if (!touchStart) return;
-            
-            const diff = touchStart - e.touches[0].clientY;
-            if (Math.abs(diff) > 30) {
-                const newIndex = currentFrame + (diff > 0 ? 1 : -1);
-                if (newIndex >= 0 && newIndex < frames.length) {
-                    updateFrame(newIndex);
+                    img.onerror = () => {
+                        console.error(`Image not found: sigil_12_06/sig${index}.png`);
+                        frame.style.display = 'none';
+                    };
+
+                    frame.appendChild(img);
                 }
-                touchStart = e.touches[0].clientY;
-            }
-        }, {passive: false});
 
-        document.addEventListener('wheel', e => {
-            const newIndex = currentFrame + (e.deltaY > 0 ? 1 : -1);
-            if (newIndex >= 0 && newIndex < frames.length) {
-                updateFrame(newIndex);
-            }
-        }, {passive: false});
+                container.appendChild(frame);
+                frames.push(frame);
 
-        updateFrame(0);
+                const stateItem = document.createElement('div');
+                stateItem.className = 'state-item';
+                stateItem.textContent = name;
+                stateList.appendChild(stateItem);
+                stateItems.push(stateItem);
+
+                stateItem.addEventListener('click', () => {
+                    currentFrameIndex = index;
+                    updateActiveFrame(index);
+                });
+            });
+
+            function updateActiveFrame(index) {
+                frames.forEach((frame, i) => {
+                    frame.style.opacity = i <= index ? '1' : '0';
+                });
+
+                stateItems.forEach((item, i) => {
+                    item.classList.toggle('active', i === index);
+                });
+
+                const activeItem = stateItems[index];
+                if (activeItem) {
+                    const offset = activeItem.offsetLeft - stateList.offsetWidth / 2 + activeItem.offsetWidth / 2;
+                    if (window.innerWidth <= 768) {
+                        stateList.scrollTo({ left: offset, behavior: 'smooth' });
+                    }
+                }
+            }
+
+            container.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                touchStartY = e.touches[0].clientY;
+            }, { passive: false });
+
+            container.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                touchEndY = e.touches[0].clientY;
+                const swipeDistance = touchStartY - touchEndY;
+
+                if (Math.abs(swipeDistance) >= scrollThreshold) {
+                    const direction = swipeDistance > 0 ? 1 : -1;
+                    let newIndex = currentFrameIndex + direction;
+
+                    if (newIndex < 0) newIndex = frames.length - 1;
+                    if (newIndex >= frames.length) newIndex = 0;
+
+                    currentFrameIndex = newIndex;
+                    updateActiveFrame(currentFrameIndex);
+
+                    touchStartY = touchEndY;
+                }
+            }, { passive: false });
+
+            window.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                scrollDelta += event.deltaY;
+
+                if (Math.abs(scrollDelta) >= scrollThreshold) {
+                    const direction = scrollDelta > 0 ? 1 : -1;
+                    let newIndex = currentFrameIndex + direction;
+
+                    if (newIndex < 0) newIndex = frames.length - 1;
+                    if (newIndex >= frames.length) newIndex = 0;
+
+                    currentFrameIndex = newIndex;
+                    updateActiveFrame(currentFrameIndex);
+
+                    scrollDelta = 0;
+                }
+            }, { passive: false });
+
+            updateActiveFrame(0);
+        });
     </script>
 </body>
 </html>
